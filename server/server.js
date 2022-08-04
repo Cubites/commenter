@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const mariadb= require('mariadb/callback');
+const axios = require('axios');
 
 const app = express();
 
@@ -16,8 +17,11 @@ const Mariadb = mariadb.createConnection({
     database: process.env.DB_DATABASE
 });
 
-app.get('/', (req, res) => {
+app.get('/home', (req, res) => {
     console.log('메인 페이지');
+    axios.get('https://openapi.naver.com/v1/search/book.json?d_isbn=9791158392406')
+        .then(data => res.send(data))
+        .catch(err => console.log(err));
 });
 
 app.listen(app.get('port'), () => {

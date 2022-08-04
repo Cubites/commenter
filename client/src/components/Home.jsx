@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const Main = styled.div`
   background-image: url("/images/main.png");
@@ -71,6 +72,8 @@ const LoginButton = styled.button`
 
 const Home = () => {
   const [SearchText, setSearchText] = useState("");
+  axios.get('/home')
+    .then(rs => console.log(rs));
   return (
     <Main>
       <Logo src="/images/logo.png" alt="logo"/>
