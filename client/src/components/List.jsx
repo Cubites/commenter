@@ -1,8 +1,18 @@
-import React from 'react'
+import React from 'react';
+import styled from 'styled-components';
 
-const List = () => {
+const Container = styled.div`
+  padding-left: 15%;
+  padding-right: 15%;
+  height: 500px;
+`
+
+const List = ({Books}) => {
+  console.log(Books);
   return (
-    <div>List</div>
+    <Container>
+
+    </Container>
   )
 }
 

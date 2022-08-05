@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -17,7 +18,7 @@ const Logo = styled.img`
   top: 20px;
   width: 200px;
 `;
-const SearchBox = styled.div`
+const SearchBox = styled.form`
   position: relative;
   top: 500px;
   width: 700px;
@@ -53,35 +54,63 @@ const SearchButton = styled.button`
   background-color: #44B606;
   opacity: 0.8;
   text-align: center;
+  border: none;
   border-radius: 25px;
   display: inline-block;
   position: absolute;
   right: 0;
+  color: #fff;
   font-size: 20px;
   font-weight: bold;
   opacity: 0.5;
 `;
 const LoginButton = styled.button`
-  width: 80px;
+  width: 100px;
   height: 40px;
   display: block;
   position: absolute;
   top: 20px;
   right: 20px;
+  background-color: #44B606;
+  opacity: 0.7;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  &:hover{
+    opacity: 1;
+  }
 `;
 
 const Home = () => {
   const [SearchText, setSearchText] = useState("");
-  axios.get('/home')
-    .then(rs => console.log(rs));
+  const navigate = useNavigate();
+
+  const MoveMainPage = (e) => {
+    e.preventDefault();
+    navigate('/search');
+  }
+
+  const textHandler = (e) => {
+    e.preventDefault();
+    setSearchText(e.currentTarget.value);
+  }
+
+  const SubmitHandler = (e) => {
+    e.preventDefault();
+    axios.get(`/search/book?name=${SearchText}`)
+      .then(res => console.log(res))
+      .catch(err => console.log("err : " + err));
+  }
+
   return (
     <Main>
-      <Logo src="/images/logo.png" alt="logo"/>
-      <LoginButton>로그인</LoginButton>
-      <SearchBox style={{display: "flex"}}>
+      <Logo src="/images/logo_color.png" alt="logo"/>
+      <LoginButton onClick={MoveMainPage}>메인 페이지</LoginButton>
+      <SearchBox style={{display: "flex"}} onSubmit={SubmitHandler}>
         <SearchIcon src="/images/search_icon.png" alt="search_icon" />
-        <SearchInput type="text" value={SearchText} onChange={setSearchText} placeholder="검색어를 입력해주세요."/>
-        <SearchButton>검색</SearchButton>
+        <SearchInput type="text" value={SearchText} onChange={textHandler} placeholder="검색어를 입력해주세요."/>
+        <SearchButton type="submit">검색</SearchButton>
       </SearchBox>
     </Main>
   )
