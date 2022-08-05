@@ -5,14 +5,14 @@ import List from './List';
 
 const MainPage = () => {
   const [SearchText, setSearchText] = useState("");
-  const [Books, setBooks] = useState({});
+  const [Books, setBooks] = useState([]);
   useEffect(() => {
     if(SearchText != ""){
       axios.get(`/search/book?name=${SearchText}`)
         .then(res => {
           let booksCopy = Books;
           let booksData = res.data.data;
-          setBooks({...booksCopy, booksData});
+          setBooks(...booksCopy, booksData);
           console.log(res.data.data);
         })
         .catch(err => console.log("err : " + err));
@@ -21,7 +21,7 @@ const MainPage = () => {
   return (
     <>
       <Header setSearchText={setSearchText}/>
-      <List SearchText={Books}/>
+      <List Books={Books}/>
     </>
   )
 }
