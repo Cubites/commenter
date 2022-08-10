@@ -26,11 +26,10 @@ const login = require('./routes/login.js');
 // app.use('/', login);
 app.post('/user/login', login, (req, res) => {
     console.log('로그인 확인 완료');
-    let expireDate = new Date(Date.now() + 10 * 1000);
-
-    res.cookie('auth', req.body.user_code, { expires: expireDate, httpOnly: true, signed: true})
-        .status(200)
-        .send({loginSuccess: true});
+    // let expireDate = new Date(Date.now() + 10 * 1000);
+    // res.cookie('auth', req.body.user_code, { expires: expireDate, httpOnly: true, signed: true})
+    //     .status(200)
+    //     .send({loginSuccess: true});
 });
 
 let client_id = process.env.NAVER_CLIENT_ID;

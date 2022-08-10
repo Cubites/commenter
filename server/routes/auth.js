@@ -1,6 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+// const dotenv = require('dotenv');
 const router = express.Router();
+
+// dotenv.config({path: path.resolve(__dirname, '../.env')});
 
 exports.authenticated = (req, res, next) => {
     const check = req.body.user_code;
@@ -12,4 +15,8 @@ exports.authenticated = (req, res, next) => {
             next();
         });
     });
+}
+
+exports.jwt = () => {
+    
 }
