@@ -8,7 +8,7 @@ const router = express.Router();
 
 // dotenv.config({path: path.resolve(__dirname, '../.env')});
 
-const { isLoggedIn, isJoined } = require('./middlewares');
+const { accessToken } = require('./jwt');
 const { authenticated } = require('./auth');
 
 const Mariadb = mariadb.createPool({
@@ -19,63 +19,104 @@ const Mariadb = mariadb.createPool({
     bigIntAsNumber: true
 });
 
+
+async function tokenCompare(id_token, token, same_return) {
+    console.log('유저 정보 비교');
+    let isMatch = await bcrypt.compare(id_token.token, token).then((isMatch => console.log(isMatch)));
+    console.dir(isMatch);
+    if(isMatch) return id_token.id;
+    return same_return;
+}
+
 // login
-router.post('/user/login', (req, res, next) => {
+const newUserCheck = (req, res, next) => {
+    req.body.user_id = 0;
     Mariadb.getConnection()
         .then(conn => {
-            // 로그인 시도한 유저와 같은 api인 계정 정보만 호출
-            conn.query(`select id, ${req.body.login_method}_token as token from user where not ${req.body.login_method}_token = null;`)
-                .then(data => {
-                    console.log('--- token search query check ---');
-                    console.log(data); // 열 데이터 유무와 관계없이 값 출력
-                    console.log(data.length); // 열 데이터가 없으면 0, 있으면 열 갯수 출력
-                    console.log(data[0]); // 열 데이터가 없으면 undefined, 있으면 배열 형태로 출력
-                    console.log(data[0].token); // 열 데이터가 없으면 에러발생, 열 데이터는 있으나 값이 없으면 null
-                    res.status(200).send('token 읽기 성공');
-
-                    // if(data[0] !== undefined){ // 유저가 한명이라도 있는 경우
-                    //     console.log("No User filtered : " + data[0].token);
-                    //     // data.forEach(datum => {
-                    //     //     if(datum.token){ // 해당 유저가 입력받은 유저와 같은 로그인 API(네이버, 카카오)를 쓰는 경우
-                    //     //         console.log("data : " + datum.token);
-                    //     //         bcrypt.compare(req.body.user_code, datum.token, (err, isMatch) => {
-                    //     //             console.log(isMatch);
-                    //     //             if(err){
-                    //     //                 res.status(500).send("bcrypt error : " + err);
-                    //     //             }else{
-                    //     //                 if(isMatch){
-                    //     //                     res.status(200).send('기존에 있는 사용자입니다.');
-                    //     //                 }else{
-                    //     //                     let transPassword = authenticated(req.body.user_code);
-                    //     //                     res.status(200).send({data: transPassword});
-                    //     //                     // conn.query(`
-                    //     //                     //     insert into user (id, nickname, ${req.body.login_method}_token)
-                    //     //                     //         value (${data.length + 1}, '${(Math.round(Math.random() * 1000000))}', '${transPassword}');
-                    //     //                     // `);
-                    //     //                     // res.status(200).send('신규 유저입니다. 저장했습니다.');
-                    //     //                 }
-                    //     //             }
-                    //     //         });
-                    //     //     }
-                    //     // });
-                    // }else{
-                    //     res.status(200).send('유저가 없습니다.');
-                    //     // conn.query(`
-                    //     //     insert into user (id, nickname, ${req.body.login_method}_token)
-                    //     //         value (${user_count[0].num + 1}, '${(Math.round(Math.random() * 1000000))}', '${req.body.user_code}');
-                    //     // `)
-                    //     // .then(d => {
-                    //     //     console.log(d)
-                    //     //     res.status(200).send('신규 유저입니다. 저장했습니다.');
-                    //     // })
-                    //     // .catch(err => {
-                    //     //     res.status(500).send('insert error : ' + err);
-                    //     // });
-                    // }
+            conn.query(`select id, ${req.body.login_method}_token as token from user where ${req.body.login_method}_token is not null;`)
+                .then(tokens => {
+                    console.log('--- 1. 같은 로그인 api를 사용하는 유저 데이터 호출 ---');
+                    console.log(tokens[0]);
+                    console.log('---------------------------------');
+                    tokens.forEach(id_token => {
+                        bcrypt.compareSync(req.body.user_code, id_token.token, (err, isMatch) => {
+                            console.log('1-1. isMatch : ' + isMatch);
+                            if(err) {
+                                console.log('err');
+                                res.status(500).send('bcrypt err : ' + err);
+                            }
+                            if(isMatch){
+                                req.body.user_id = id_token.id;
+                            }
+                        });
+                    });
                 })
-                .catch(err => res.status(500).send('query error to load from db : ' + err));
-        })
-        .catch(err => res.status(500).send('db connection error : ' + err));
+                .then(() => {
+                    console.log('2. 기존 유저인지 확인한 후, user_id 값 출력');
+                    console.log('3. user_id : ' + req.body.user_id + '(값이 0이면 신규유저, 0이 아니면 기존 유저');
+                    if(req.body.user_id === 0){
+                        console.log('4-1-1. 신규유저로 판단, db에 유저 정보 저장 시작');
+                        // 기존의 유저가 아닌 경우, 유저 정보 저장
+                        bcrypt.genSalt(Number(process.env.SALT_ROUNDS), function (err, salt){
+                            if(err) res.status(500).send("bcrypt salt err" + err);
+                            bcrypt.hash(req.body.user_code, salt, function (err, hash){
+                                if(err) res.status(500).send("bcrypt hash err" + err);
+                                conn.query(`select Max(id) as last_user_num from user;`) // id값 생성을 위한 유저 수 호출
+                                    .then(userCount => {
+                                        let newUserId = userCount[0].last_user_num + 1;
+                                        conn.query(`
+                                            insert user(id, nickname, ${req.body.login_method}_token)
+                                                value(${newUserId}, '${(Math.round(Math.random() * 1000000))}', '${hash}');
+                                        `)
+                                        .then(() => {
+                                            console.log('4-1-2. 신규 유저 등록 완료');
+                                            next();
+                                        })
+                                        .catch(err => res.status(500).send('err that insert user in db : ' + err));
+                                    }).catch(err => res.status(500).send('error when call max id : ' + err));
+                            });
+                        });
+                    }else{
+                        console.log('4-2. 기존에 있던 유저로 판단');
+                        next(); // 기존 유저면 id값을 req에 바로 넣고, 신규 유저면 db 유저 정보 저장 후 id값을 req에 넣음
+                    }  
+                }).catch(err => res.status(500).send('error when call number of user that have same login_method : ' + err));
+        }).catch(err => res.status(500).send('db connection error (newUserCheck) : ' + err));
+}
+
+router.post('/user/login', newUserCheck, (req, res, next) => {
+    console.log('5. 기존, 신규 유저 확인 완료');
+    console.log('user_id : ' + req.body.user_id + '(값이 0이면 신규유저, 0이 아니면 기존 유저');
+    if(req.body.user_id !== 0){
+        console.log('6-1. 기존 유저이므로 accessToken 발급 후 종료');
+        res.status(200).send({accessToken: accessToken(req.body)});
+        res.end();
+    }else{
+        console.log('6-2. 신규 유저로 확인, db에 유저정보가 제대로 저장되었는지 확인');
+        Mariadb.getConnection()
+        .then(conn => {
+            conn.query(`select id, ${req.body.login_method}_token as token from user where ${req.body.login_method}_token is not null;`)
+                .then(tokens => {
+                    console.log('--- 7. 같은 로그인 api를 사용하는 유저 데이터 호출 ---');
+                    console.log(tokens);
+                    // console.log(tokens.length); // 열 데이터가 없으면 0, 있으면 열 갯수 출력
+                    tokens.forEach(id_token => {
+                        bcrypt.compare(req.body.user_code, id_token.token, (err, isMatch) => {
+                            if(err) res.status(500).send('bcrypt err : ' + err);
+                            console.log('8. 신규 유저 정보와 db에 저장한 신규 유저 정보가 일치하는지 확인');
+                            console.log('8-1. isMatch : ' + isMatch);
+                            if(isMatch){
+                                console.log('9. 신규 유저 정보가 db에 이상없이 저장됨을 확인');
+                                req.body.user_id = id_token.id;
+                                res.status(200).send({accessToken: accessToken(req.body)});
+                                res.end();
+                                return;
+                            }
+                        });
+                    });           
+                }).catch(err => res.status(500).send('error when call number of user that have same login_method : ' + err));
+        }).catch(err => res.status(500).send('db connection error (newUserCheck) : ' + err));
+    }
 });
 
 module.exports = router;
