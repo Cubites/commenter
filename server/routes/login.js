@@ -40,20 +40,22 @@ const newUserCheck = (req, res, next) => {
                     console.log('--- 1. 같은 로그인 api를 사용하는 유저 데이터 호출 ---');
                     console.log(tokens[0]);
                     console.log('---------------------------------');
-                    tokens.forEach(id_token => {
-                        console.log('1-1. tokens');
-                        console.log(req.body);
-                        req.body.user_code = tokenCompare(req.body.user_code, id_token, req.body.user_id);
-                        // bcrypt.compareSync(req.body.user_code, id_token.token, (err, isMatch) => {
-                        //     console.log('1-2. isMatch : ' + isMatch);
-                        //     if(err) {
-                        //         res.status(500).send('bcrypt err : ' + err);
-                        //     }
-                        //     if(isMatch){
-                        //         req.body.user_id = id_token.id;
-                        //     }
-                        // });
-                    });
+                    Promise.all(() => {
+                        tokens.forEach(id_token => {
+                            console.log('1-1. tokens');
+                            console.log(req.body);
+                            req.body.user_code = tokenCompare(req.body.user_code, id_token, req.body.user_id);
+                            // bcrypt.compareSync(req.body.user_code, id_token.token, (err, isMatch) => {
+                            //     console.log('1-2. isMatch : ' + isMatch);
+                            //     if(err) {
+                            //         res.status(500).send('bcrypt err : ' + err);
+                            //     }
+                            //     if(isMatch){
+                            //         req.body.user_id = id_token.id;
+                            //     }
+                            // });
+                        });
+                    })
                 })
                 .then(() => {
                     console.log('2. 기존 유저인지 확인한 후, user_id 값 출력');
