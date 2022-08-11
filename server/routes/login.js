@@ -20,12 +20,14 @@ const Mariadb = mariadb.createPool({
 });
 
 
-async function tokenCompare(id_token, token, same_return) {
+async function tokenCompare(plainData, id_token, same_return) {
     console.log('유저 정보 비교');
-    let isMatch = await bcrypt.compare(id_token.token, token).then((isMatch => console.log(isMatch)));
-    console.dir(isMatch);
-    if(isMatch) return id_token.id;
-    return same_return;
+    console.log(plainData);
+    await bcrypt.compareSync(plainData, id_token.token, (err, isMatch) => {
+        console.log(isMatch);
+        if(isMatch) return id_token.id;
+        return 0;
+    });
 }
 
 // login
@@ -39,16 +41,18 @@ const newUserCheck = (req, res, next) => {
                     console.log(tokens[0]);
                     console.log('---------------------------------');
                     tokens.forEach(id_token => {
-                        bcrypt.compareSync(req.body.user_code, id_token.token, (err, isMatch) => {
-                            console.log('1-1. isMatch : ' + isMatch);
-                            if(err) {
-                                console.log('err');
-                                res.status(500).send('bcrypt err : ' + err);
-                            }
-                            if(isMatch){
-                                req.body.user_id = id_token.id;
-                            }
-                        });
+                        console.log('1-1. tokens');
+                        console.log(req.body);
+                        req.body.user_code = tokenCompare(req.body.user_code, id_token, req.body.user_id);
+                        // bcrypt.compareSync(req.body.user_code, id_token.token, (err, isMatch) => {
+                        //     console.log('1-2. isMatch : ' + isMatch);
+                        //     if(err) {
+                        //         res.status(500).send('bcrypt err : ' + err);
+                        //     }
+                        //     if(isMatch){
+                        //         req.body.user_id = id_token.id;
+                        //     }
+                        // });
                     });
                 })
                 .then(() => {
