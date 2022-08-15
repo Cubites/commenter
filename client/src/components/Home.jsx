@@ -83,6 +83,7 @@ const LoginButton = styled.button`
 `;
 
 const Home = () => {
+  console.log("Home");
   const [SearchText, setSearchText] = useState("");
   const navigate = useNavigate();
 
