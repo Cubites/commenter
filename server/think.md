@@ -11,3 +11,15 @@
   * <code>console.log(data.length);</code> : 받은 열 데이터가 없으면 0, 있으면 열 갯수 출력
   * <code>console.log(data[0]);</code> : 받은 열 데이터가 없으면 undefined, 있으면 배열 형태로 출력
   * <code>console.log(data[0].token);</code> : 열 데이터가 없으면 에러발생, 열 데이터는 있으나 값이 없으면 null
+
+## 에러
+### SqlError: Pool fails to create connection: (conn=29975, no: 1040, SQLState: 08004) Too many connections
+* 원인: AWS RDS DB에 커넥션이 많아 생기는 문제
+* 커넥션 제한 확인
+  * 1. <code>show variables like 'max_connections';</code> 쿼리문 실행
+  * 2. 결과에서 최대 커넥션 수 확인가능
+* 해결 방법
+  * 1. 일정시간 요청이 없는 커넥션이 자동으로 끊어지게 설정
+  * 2. 커넥션을 닫을 때까지 기다리는 시간을 짧게 설정
+    * 시간 확인 : <code>show vaiables like '%timeout%';</code> 실행
+      <br>> wait_timeout 값(단위: 초) 확인 (기본값 : 128800초; 8시간)

@@ -9,16 +9,13 @@ const router = express.Router();
 // dotenv.config({path: path.resolve(__dirname, '../.env')});
 
 const { accessToken, refressToken } = require('./jwt');
-const { authenticated } = require('./auth');
 
 const Mariadb = mariadb.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    bigIntAsNumber: true
+    database: process.env.DB_DATABASE
 });
-
 
 // login
 const newUserCheck = (req, res, next) => {
@@ -26,7 +23,7 @@ const newUserCheck = (req, res, next) => {
     if(req.body.login_method != 'n' && req.body.login_method != 'k'){
         res.status(404).send('잘못된 접근입니다.');
     }else{
-    Mariadb.getConnection()
+        Mariadb.getConnection()
         .then(conn => {
             // user_code로 db를 조회하여 신규 유저인지 판별
             conn.query(`select id, ${req.body.login_method}_token as token from user where ${req.body.login_method}_token = '${req.body.user_code}';`)
@@ -34,6 +31,7 @@ const newUserCheck = (req, res, next) => {
                     if(userInfo.length !== 0){ // 기존 유저인 경우 id값을 넘김
                         req.body.user_id = userInfo.id;
                         req.body.login_success = true;
+                        conn.release();
                         next();
                     }else{ // 신규 유저인 경우 db에 등록
                         conn.query(`select Max(id) as last_user_num from user;`)
@@ -45,6 +43,7 @@ const newUserCheck = (req, res, next) => {
                             `)
                                 .then(() => {
                                     req.body.login_success = true;
+                                    conn.release();
                                     next();
                                 }).catch(err => {
                                     req.body.login_success = false;
@@ -78,30 +77,32 @@ router.post('/user/login', newUserCheck, (req, res, next) => {
             next();
         }else{ // 신규 유저인 경우 db에 유저정보가 제대로 저장되었는지 확인 후, accessToken 발급
             Mariadb.getConnection()
-            .then(conn => {
-                // user_code로 db를 조회하여 유저 조회
-                conn.query(`
-                    select id, ${req.body.login_method}_token as token from user 
-                        where ${req.body.login_method}_token = '${req.body.user_code}';
-                `)
-                    .then(userInfo => {
-                        if(userInfo.length !== 0){
-                            req.body.user_id = userInfo.id;
-                            req.body.login_success = true;
-                            next()
-                        }else{
+                .then(conn => {
+                    // user_code로 db를 조회하여 유저 조회
+                    conn.query(`
+                        select id, ${req.body.login_method}_token as token from user 
+                            where ${req.body.login_method}_token = '${req.body.user_code}';
+                    `)
+                        .then(userInfo => {
+                            if(userInfo.length !== 0){
+                                req.body.user_id = userInfo.id;
+                                req.body.login_success = true;
+                                conn.release();
+                                next()
+                            }else{
+                                req.body.login_success = false;
+                                console.log("Can't not find newUserInfo.");
+                                conn.release();
+                                next();
+                            }
+                        }).catch(err => {
                             req.body.login_success = false;
-                            console.log("Can't not find newUserInfo.")
-                            next();
-                        }
-                    }).catch(err => {
-                        req.body.login_success = false;
-                        console.log('error when call number of user that have same login_method : ' + err)
-                    });
-            }).catch(err => {
-                req.body.login_success = false;
-                console.log('db connection error (newUserCheck) : ' + err);
-            });
+                            console.log('error when call number of user that have same login_method : ' + err)
+                        });
+                }).catch(err => {
+                    req.body.login_success = false;
+                    console.log('db connection error (newUserCheck) : ' + err);
+                });
         }
     }
 });

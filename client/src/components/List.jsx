@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 const Container = styled.div`
   padding-left: 15%;
@@ -11,9 +12,20 @@ const Bookblock = styled.img`
   margin: 2%;
 `
 
-const List = ({Books}) => {
-  console.log(typeof(Books));
-  console.log(Books);
+const List = ({SearchText}) => {
+  const [Books, setBooks] = useState([]);
+  useEffect(() => {
+    if(SearchText !== ""){
+      axios.get(`/search/book?name=${SearchText}`)
+        .then(res => {
+          let booksCopy = [];
+          let booksData = res.data.data;
+          setBooks(...booksCopy, booksData);
+          console.log(res.data.data);
+        })
+        .catch(err => console.log("err : " + err));
+    }
+  }, [SearchText]);
   if(Books !== {}){
     console.log();  
   }
