@@ -13,21 +13,21 @@ const Bookblock = styled.img`
 `
 
 const List = ({SearchText}) => {
+  let data;
   const [Books, setBooks] = useState([]);
   useEffect(() => {    
     if(SearchText != ""){
-      axios.get(`/book/search?name=${SearchText}`)
+      axios.get(`/book/info?id=1`)
         .then(res => {
-          setBooks(res.data.data);
+          data = res.data;
+          console.log(data);
         })
         .catch(err => console.log("err : " + err));
     }
   }, [SearchText]);  
   return (
     <Container>
-      {
-        Books === {} ? "" : Books.map((data, i) => <Bookblock key={"book_" + i} src={data.image} href = "/book/1"/>)
-      }
+
     </Container>
   )
 }

@@ -99,7 +99,7 @@ const Home = () => {
 
   const SubmitHandler = (e) => {
     e.preventDefault();
-    axios.get(`/search/book?name=${SearchText}`)
+    axios.get(`/book/search?name=${SearchText}`)
       .then(res => console.log(res))
       .catch(err => console.log("err : " + err));
   }
