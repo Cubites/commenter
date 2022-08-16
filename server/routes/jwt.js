@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
-const mariadb = require('mariadb');
 
 // login check
 const accessToken = (data, secret) => {
     const payload = {
-        user_id : data,
+        userId: data,
         role: 'user'
     };
 
@@ -13,10 +12,12 @@ const accessToken = (data, secret) => {
     })
 };
 
-const refressToken = (data, secret) => {
-    let expireDate = new Date(Date.now() + (3 * 60 * 60 * 1000));
+const refressToken = (user_id, accessToken, secret) => {
+    let expireDate = Date.now() + (3 * 60 * 60 * 1000);
+    console.log('refressToken expireDate : ' + expireDate);
     const payload = {
-        accessToken : data,
+        userId : user_id,
+        accessToken : accessToken,
         expire: expireDate
     };
 
@@ -26,24 +27,4 @@ const refressToken = (data, secret) => {
     };
 }
 
-const accessTokenVerify = (token, secret) => {
-    jwt.verify(token, secret, (err, decoded) => {
-        if(err){
-            // if(err.message == 'jwt expired'){
-
-            // }
-            console.log(err.message);
-            return null;
-        }
-        console.log(decoded);
-        return decoded;
-    });
-    return accessToken;
-    // try{
-    //     return jwt.verify(token, secret);
-    // } catch (err) {
-    //     return null;
-    // }
-}
-
-module.exports = { accessToken, refressToken, accessTokenVerify };
+module.exports = { accessToken, refressToken };
