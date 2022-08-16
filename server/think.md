@@ -23,3 +23,12 @@
   * 2. 커넥션을 닫을 때까지 기다리는 시간을 짧게 설정
     * 시간 확인 : <code>show vaiables like '%timeout%';</code> 실행
       <br>> wait_timeout 값(단위: 초) 확인 (기본값 : 128800초; 8시간)
+
+## JWT
+* 만료시간을 넣은 JWT 값을 verify 했을 때 결과
+  * 만료시간이 지나지 않은 경우
+    <br>> 넣은 payload 값, iat(토큰 발급 시간), exp(만료 시간)이 return 됨
+  * 만료시간이 지난 경우
+    <br>> 에러 발생(err.message === 'jwt expired')
+* 옳바르지 않은 JWT 값을 verify 햇을 때 결과
+  <br>> 에러 발생(err.message === 'invalid token')
