@@ -29,7 +29,10 @@ const newUserCheck = (req, res, next) => {
         Mariadb.getConnection()
         .then(conn => {
             // user_code로 db를 조회하여 신규 유저인지 판별
-            conn.query(`select user_id, ${req.body.login_method}_token as token from user where ${req.body.login_method}_token = '${req.body.user_code}';`)
+            conn.query(`
+                select user_id, ${req.body.login_method}_token as token from user 
+                    where ${req.body.login_method}_token = '${req.body.user_code}';
+                `)
                 .then(userInfo => {
                     if(userInfo.length !== 0){ // 기존 유저인 경우 id값을 넘김
                         console.log('4. 기존 유저로 판단, 신원 확인 완료');
@@ -41,10 +44,7 @@ const newUserCheck = (req, res, next) => {
                         conn.query(`select Max(user_id) as last_user_num from user;`)
                             .then(userCount => {
                                 console.log('5. 신규 유저에게 발급할 user id 생성');
-                                console.log(userCount[0]);
-                                console.log(userCount.length);
                                 let newUserId = userCount[0].last_user_num + 1;
-                                console.log(newUserId);
                                 conn.query(`
                                     insert user(user_id, nickname, ${req.body.login_method}_token)
                                         value(${newUserId}, '${(Math.round(Math.random() * 1000000))}', '${req.body.user_code}');
@@ -94,11 +94,10 @@ router.post('/user/login', newUserCheck, (req, res, next) => {
                 .then(conn => {
                     // user_code로 db를 조회하여 유저 조회
                     conn.query(`
-                        select user_id, ${req.body.login_method}_token as token from user 
+                        select user_id as id, ${req.body.login_method}_token as token from user 
                             where ${req.body.login_method}_token = '${req.body.user_code}';
                     `)
                         .then(userInfo => {
-                            console.log(userInfo);
                             if(userInfo.length !== 0){
                                 console.log('9. 신규 유저 데이터가 정상적으로 조회됨, 신원 확인 완료, 로그인 완료')
                                 req.body.user_id = userInfo[0].id;

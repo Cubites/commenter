@@ -8,7 +8,7 @@ const accessToken = (data, secret) => {
     };
 
     return jwt.sign(payload, secret, {
-        expiresIn: '10m'
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
     })
 };
 
