@@ -36,11 +36,19 @@ app.use('/', (req, res, next) => {
     // console.log('-------------------');
     if(req.signedCookies.auth !== undefined){ // accessToken이 있는 경우
         console.log('0. accessToken 체크');
-        let tokenCheck = accessCheck(req.signedCookies.auth.accessToken, process.env.JWT_SECRET_KEY);
-        if(tokenCheck.accessToken !== null){
+        let tokenCheck = accessCheck(req.signedCookies.auth.accessToken, process.env.JWT_SECRET_KEY, conn);
+        console.log(tokenCheck);
+        if(tokenCheck.accessToken !== null && !tokenCheck.isLogout){
+            console.log('0-2. 만료된 access token을 가진 사용자 확인. access token 재발급');
             res.cookie('auth', {user_id: tokenCheck.user_id}, {httpOnly: true, signed: true});
+        }else if(tokenCheck.accessToken === null && !tokenCheck.isLogout){
+            console.log('0-2. 유효한 access token을 가진 사용자 확인');
+            req.body.isLogout = tokenCheck.isLogout; // 로그인 유지 여부(isLogout) req.body에 추가
         }
-        req.body.isLogout = tokenCheck.isLogout; // 로그인 유지 여부(isLogout) req.body에 추가
+        if(tokenCheck.isLogout){
+            console.log('0-2. 부정한 사용자 확인 로그아웃 처리');
+            req.body.isLogout = true;
+        }
     }
     next();
 });
@@ -55,23 +63,25 @@ app.post('/user/login', login, (req, res) => {
         if(req.body.isLogout !== undefined){ // isLogout이 존재하는 경우 = accessToken이 존재 > 로그인 시도가 안돼야 함
             console.log('12. 로그인 중, 로그인 시도. 로그아웃 처리');
             res.status(204).send({isLogout: true});
+        }else{
+            accToken = accessToken(req.body.user_id, process.env.JWT_SECRET_KEY);
+            refToken = refressToken(req.body.user_id, accToken, process.env.JWT_SECRET_KEY);
+            console.log(accToken);
+            conn.query(`
+                insert login_token (user_id, access_token, refresh_token, refresh_expire)
+                    values(${req.body.user_id}, '${accToken}', '${refToken.refressToken}', ${refToken.expire});
+            `, (err, data) => {
+                if(err){
+                    console.log('12. 발급한 토큰 저장 실패');
+                    console.log(err);
+                }else{
+                    console.log('12. 발급한 토큰 저장 성공');
+                }
+            });
+            res.cookie('auth', {user_id: req.body.user_id, accessToken : accToken}, {httpOnly: true, signed: true})
+                .status(200)
+                .send({user_id: req.body.user_id, login_success: true, isLogout: false});
         }
-        accToken = accessToken(req.body.user_id, process.env.JWT_SECRET_KEY);
-        refToken = refressToken(req.body.user_id, accToken, process.env.JWT_SECRET_KEY);
-        conn.query(`
-            insert login_token (user_id, access_token, refresh_token, refresh_expire)
-                values(${req.body.user_id}, '${accToken}', '${refToken.refressToken}', ${refToken.expire});
-        `, (err, data) => {
-            if(err){
-                console.log('12. 발급한 토큰 저장 실패');
-                console.log(err);
-            }else{
-                console.log('12. 발급한 토큰 저장 성공');
-            }
-        });
-        res.cookie('auth', {user_id: req.body.user_id, accessToken : accToken}, {httpOnly: true, signed: true});
-        res.status(200)
-            .send({user_id: req.body.user_id, login_success: true, isLogout: false});
     }
 });
 
@@ -91,7 +101,7 @@ app.get('/search/book', (req, res) => {
     axios(options)
         .then((rs) => {
             console.log("api 데이터 요청 성공");
-            res.send(200, { "data": rs.data.items });
+            res.status(200).send({ "data": rs.data.items });
         })
         .catch(err => res.send(err));
     }
