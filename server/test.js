@@ -1,64 +1,73 @@
-// // let expireDate = Date.now() + (3 * 60 * 60 * 1000);
-// // console.log(expireDate);
-// // console.log(Date(expireDate));
-// // console.log(typeof(expireDate));
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
 
-// const jwt = require('jsonwebtoken');
-// const dotenv = require('dotenv');
-// dotenv.config();
+let access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjYwNzk0MDQ5LCJleHAiOjE2NjA3OTQwNTl9.pOZHBnu25K-avkfR24WP6oUbEJm4aDXFHqKUoC6sPBA';
+let refresh_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImFjY2Vzc1Rva2VuIjoiZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5U1dRaU9qRXNJbkp2YkdVaU9pSjFjMlZ5SWl3aWFXRjBJam94TmpZd056azBNRFE1TENKbGVIQWlPakUyTmpBM09UUXdOVGw5LnBPWkhCbnUyNUstYXZrZlIyNFdQNm9VYkVKbTRhRFhGSHFLVW9DNnNQQkEiLCJleHBpcmUiOjE2NjA4MDQ4NDk3NDQsImlhdCI6MTY2MDc5NDA0OX0.UlPRqPXc_IQs5VbzfPoeshw0gUSd1T6THZugHKP1_8E';
+let refresh_expire = 1660804849744;
 
-// let user_id = 1
-// let accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsImlhdCI6MTY2MDYzMjg3NywiZXhwIjoxNjYwNjMyODg3fQ.whJuSHMJQGCT3fqyK_DtIn1FjxDvWYskPqNXsId44js'
-// let refreshToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NUb2tlbiI6ImV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUp5YjJ4bElqb2lkWE5sY2lJc0ltbGhkQ0k2TVRZMk1EWXpNamczTnl3aVpYaHdJam94TmpZd05qTXlPRGczZlEud2hKdVNITUpRR0NUM2ZxeUtfRHRJbjFGanhEdldZc2tQcU5Yc0lkNDRqcyIsImV4cGlyZSI6MTY2MDY0MzY3Nzk0NCwiaWF0IjoxNjYwNjMyODc3fQ.WlWnHKUBbvU8R3dlR1DI-Fs0dLK1VkHY5nSxvb_LmVM';
+let secret = process.env.JWT_SECRET_KEY;
 
-// let accessToken2 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjYwNjQxODYzLCJleHAiOjE2NjA2NDI0NjN9.Z35Iauf4H6GDqnjBqo52g-VfGBfPcpe4f3gbnToh57E';
-
-// const accessCheck = (access_token, secret) => {
-//     return jwt.verify(access_token, secret, (err, decoded) => {
-//         if(err){
-//             if(err.message == 'jwt expired'){
-//                 console.log('accessToken이 만료되었습니다.');
-//                 return refreshCheck(access_token, secret);
-//             }else if(err.message == 'invalid token'){
-//                 console.log('로그아웃 처리');
-//             }else{
-//                 console.log('access token error : ' + err);
+console.log('----------------------------------------------테스트----------------------------------------------');
+// let results = jwt.verify(refresh_token, secret, (err, decoded) => {
+//     if(err){
+//         console.log('0-5. refresh token 검증 중 에러 발생');
+//         console.log(err);
+//         return { accessToken: null, isLogout: true }
+//     }
+//     if(decoded.accessToken == access_token){
+//         console.log('0-5. access token 조회 성공');
+//         console.log('user_id : ' + decoded.userId);
+//         if(decoded.expire > Date.now()){
+//             console.log('0-6. refresh token 유효. access token 재발급 시작');
+//             const payload = {
+//                 userId: decoded.userId,
+//                 role: 'user'
+//             };
+//             return { 
+//                 user_id: decoded.userId, 
+//                 accessToken: jwt.sign(payload, secret, { expiresIn: '10m'}),
+//                 isLogout: false
 //             }
+//         }else{
+//             console.log('0-6. refresh token 만료. 다시 로그인 필요.');
+//             conn.query(`delete from login_token where user_id = ${decoded.userId};`, (err) => {
+//                 if(err){
+//                     console.log('0-7. 만료된 refresh token 삭제 실패');
+//                 }else{
+//                     console.log('0-7. 만료된 refresh token 삭제 성공');
+//                 }
+//             });
+//             return { accessToken: null, isLogout: true }
 //         }
-//         return decoded;
-//     });
-// }
+//     }
+// });
+// console.log('-- jwt.verify() 결과 출력 --');
+// console.log(results);
 
-// const refreshCheck = (access_token, secret) => {
-//     let accessToken = '';
-//     jwt.verify(refreshToken, secret, (err, decoded) => {
-//         if(err){
-//             if(err.message == 'jwt expired'){
-//                 console.log('refresh token이 만료되었습니다. 다시 로그인 해주세요.');
-//             }else{
-//                 console.log('refresh err : ' + err);
-//             }
-//         }
-//         if(decoded.accessToken == access_token){
-//             if(decoded.expire > Date.now()){
-//                 const payload = {
-//                     userId: user_id,
-//                     role: 'user'
-//                 };
-//                 console.log('accessToken 재발급');
-//                 accessToken = jwt.sign(payload, secret, {
-//                     expiresIn: '10m'
-//                 });
-//             }
-//         }
-//     });
-//     return accessToken;
-// }
+const mariadb = require('mariadb');
 
-// let newAccessToken = accessCheck(accessToken2, process.env.JWT_SECRET_KEY);
-// console.log(newAccessToken);
+const conn = mariadb.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    bigIntAsNumber: true,
+    connectionLimit: 4
+});
 
-console.log(Date.now());
+let result;
+// conn.query(`select * from login_token where access_token = '${access_token}';`, (err, data) => {
+//     if(err) return { accessToken: null, isLogout: true };
+//     return data
+// });
 
-1660720802378
-1660724245738
+conn.query(`select * from login_token where access_token = '${access_token}';`)
+    .then(data => {
+        if(err) return { accessToken: null, isLogout: true };
+        result = data
+    })
+    .catch(err => result = err);
+
+console.log('-- conn.query() 결과 출력 --');
+console.log(result);

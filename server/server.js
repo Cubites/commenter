@@ -17,6 +17,7 @@ app.set('port', 4000);
 
 const { accessToken, refressToken } = require('./routes/jwt');
 const { accessCheck } = require('./routes/auth');
+const tokenAuth = require('./routes/auth');
 
 // Router
 const login = require('./routes/login.js');
@@ -28,6 +29,10 @@ const conn = mariadb.createConnection({
     database: process.env.DB_DATABASE,
     bigIntAsNumber: true,
     connectionLimit: 4
+});
+
+app.post('/test', tokenAuth, (req, res) => {
+    res.status(200).send(req.body.result);
 });
 
 app.use('/', (req, res, next) => {
@@ -61,8 +66,8 @@ app.post('/user/login', login, (req, res) => {
     }else{
         console.log('11. 로그인 성공, 토큰 발급 시작');
         if(req.body.isLogout !== undefined){ // isLogout이 존재하는 경우 = accessToken이 존재 > 로그인 시도가 안돼야 함
-            console.log('12. 로그인 중, 로그인 시도. 로그아웃 처리');
-            res.status(204).send({isLogout: true});
+            console.log('12. 로그인 중, 로그인 시도. 로그인시도는 무시하고 기존 로그인 유지');
+            res.status(204).send({user_id: req.body.user_id, isLogout: false});
         }else{
             accToken = accessToken(req.body.user_id, process.env.JWT_SECRET_KEY);
             refToken = refressToken(req.body.user_id, accToken, process.env.JWT_SECRET_KEY);

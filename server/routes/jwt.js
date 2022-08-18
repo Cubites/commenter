@@ -13,7 +13,7 @@ const accessToken = (data, secret) => {
 };
 
 const refressToken = (user_id, accessToken, secret) => {
-    let expireDate = Date.now() + (3 * 60 * 60 * 1000);
+    let expireDate = Date.now() + (Number(process.env.REFRESH_TOKEN_EXPIRES_IN) * 60 * 1000);
     console.log('refressToken expireDate : ' + expireDate);
     const payload = {
         userId : user_id,

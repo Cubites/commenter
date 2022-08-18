@@ -5,9 +5,11 @@ const { accessToken, refressToken } = require('./jwt');
 const refreshCheck = (accToken, secret, conn) => {
     console.log('0-3. access token 만료됨. refresh token 조회');
     let access_token = '';
-    return conn.query(`select * from login_token where access_token = '${accToken}';`, (err, data) => {
+    console.log(accToken);
+    conn.query(`select * from login_token where access_token = '${accToken}';`, (err, data) => {
         if(err) return { accessToken: null, isLogout: true };
         console.log('0-4. refresh token 체크');
+        console.log(data);
         return jwt.verify(data[0].refresh_token, secret, (err, decoded) => {
             if(err){
                 console.log('0-5. refresh token 검증 중 에러 발생');
@@ -23,7 +25,7 @@ const refreshCheck = (accToken, secret, conn) => {
                         role: 'user'
                     };
                     return { 
-                        user_id: decoded.user_id, 
+                        user_id: decoded.userId, 
                         accessToken: jwt.sign(payload, secret, { expiresIn: '10m'}),
                         isLogout: false
                     }
@@ -40,7 +42,7 @@ const refreshCheck = (accToken, secret, conn) => {
                 }
             }
         });
-    })
+    });
 }
 
 exports.accessCheck = (access_token, secret, conn) => {
@@ -52,6 +54,7 @@ exports.accessCheck = (access_token, secret, conn) => {
             if(err.message == 'jwt expired'){ // accessToken 만료. refreshToken 체크
                 console.log('0-2. accessToken이 만료되었습니다.');
                 let isAccessToken = refreshCheck(access_token, secret, conn);
+                console.log('0-6-1. isAccessToken 값 출력 : ');
                 console.log(isAccessToken);
                 if(isAccessToken.accessToken !== null){
                     conn.query(`update login_token set access_token where user_id = '${isAccessToken.user_id}';`, (err) => {
