@@ -1,5 +1,4 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 // const dotenv = require('dotenv');
 // const path = require('path');
 const mariadb = require('mariadb');
