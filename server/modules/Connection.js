@@ -1,4 +1,4 @@
-const mariadb = require('mariadb');
+const mariadb = require('mariadb/callback');
 
 const conn = mariadb.createConnection({
     host: process.env.DB_HOST,
@@ -9,4 +9,4 @@ const conn = mariadb.createConnection({
     connectionLimit: 4
 });
 
-export default conn;
+module.exports = conn;
