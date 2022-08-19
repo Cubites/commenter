@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const { accessToken, refressToken } = require('./jwt');
+const { accessToken, refressToken } = require('../modules/jwt');
 
 const refreshCheck = (accToken, secret, conn) => {
     console.log('0-3. access token 만료됨. refresh token 조회');
