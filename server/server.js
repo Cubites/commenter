@@ -14,32 +14,19 @@ app.use(cookieParser(process.env.COOKIE_SECRET_KEY));
 
 app.set('port', 4000);
 
-const { accessToken, refressToken } = require('./modules/jwt');
-const { accessCheck } = require('./routers/auth');
-// const tokenAuth = require('./routes/tokenAuth');
-
 // Router
-const login = require('./routers/login.js');
-
-const conn = mariadb.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    bigIntAsNumber: true,
-    connectionLimit: 4
-});
-
+const login = require('./routers/login');
 const tokenAuth = require('./routers/tokenAuth'); // 토큰 유효성 검사 router
 
 app.use(tokenAuth);
 
-app.post('/test', tokenAuth, (req, res, next) => {
+app.post('/', tokenAuth, (req, res, next) => {
     console.log(req.body);
-    res.status(200).send('/test 통신 정상');
+    res.status(200).send(req.body);
 });
 
 app.post('/user/login', login, (req, res) => {
+    // res.cookie('auth', {user_id: req.body.user_id, accessToken: req.body.access_token}, {httpOnly: true, signed: true})
     res.status(200).send('login 절차 실행 완료');
 });
 
