@@ -26,8 +26,8 @@ app.post('/', tokenAuth, (req, res, next) => {
 });
 
 app.post('/user/login', login, (req, res) => {
-    // res.cookie('auth', {user_id: req.body.user_id, accessToken: req.body.access_token}, {httpOnly: true, signed: true})
-    res.status(200).send('login 절차 실행 완료');
+    res.cookie('auth', [{user_id: req.body.user_id}, {access_token: req.body.accessToken}], {httpOnly: true, signed: true})
+        .status(200).send({loginSuccess: 'login 절차 실행 완료', data: req.body});
 });
 
 app.get('/search/book', (req, res) => {

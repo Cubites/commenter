@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 const Connection = require('../modules/Connection');
 const { accessToken } = require('../modules/jwt');
@@ -9,27 +10,26 @@ router.all('*', (req, res, next) => {
     console.log(req.body);
     console.log('0-1. access token이 있는지 확인');
     if(req.signedCookies.auth !== undefined){
-        console.log('0-2. Access Token 존재. 유효성 체크 시작')
-        jwt.verify(req.signedCookies.auth.accessToken, secret, (err, decoded) => {
+        console.log('0-2. Access Token 존재. 유효성 체크 시작');
+        console.log(req.signedCookies);
+        jwt.verify(req.signedCookies.auth.access_token, process.env.JWT_SECRET_KEY, (err, decoded) => {
             console.log(decoded);
             if(err){
-                if(err.message == 'jwt expired'){ // accessToken 만료. refreshToken 체크
+                if(err.message == 'jwt expired'){ // Access Token 만료. refreshToken 체크
                     console.log('0-2. Access Token 유효기간 만료.');
                     req.body.isAccessVerity = false;
                     req.body.isLogout = false;
-                    next();
-                }else if(err.message == 'invalid token'){ // 잘못된 accessToken으로 접속 시도. 부정 사용자로 간주하고 로그아웃처리
+                }else if(err.message == 'invalid token'){ // 잘못된 Access Token으로 접속 시도. 부정 사용자로 간주하고 로그아웃처리
                     console.log('0-2. 잘못된 토큰 : ' + err);
                     req.body.isAccessVerity = false;
                     req.body.isLogout = true;
-                    next();
-                }else{ // accessToken 유효성 검사 중 에러. 상황판단 불가로 일단 로그아웃 처리
+                }else{ // Access Token 유효성 검사 중 에러. 상황판단 불가로 일단 로그아웃 처리
                     console.log('0-2. Access Token 유효성 검사 error : ' + err);
                     req.body.isAccessVerity = false;
                     req.body.isLogout = true;
-                    next();
                 }
-            }else{ // 유효한 accessToken. 로그인 유지
+                next();
+            }else{ // 유효한 Access Token. 로그인 유지
                 console.log('0-2. 유효한 Access Token. 로그인 생태를 유지.');
                 // req.body.user_id = decoded;
                 req.body.isAccessVerity = true;
@@ -40,7 +40,7 @@ router.all('*', (req, res, next) => {
     }else{
         console.log('0-2. Access Token이 없음. 로그인이 되어있지 않음');
         req.body.isAccessVerity = null;
-        req.body.isLogout = true;
+        req.body.isLogout = false;
         next();
     }
 });
@@ -48,9 +48,9 @@ router.all('*', (req, res, next) => {
 // 2. Access Token 재발급 필요 유무 검사 및 재발급
 router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발급, 아니면 패스
     console.log(req.body);
-    if(req.body.isAccessVerity === false && isLogout === false){
+    if(req.body.isAccessVerity === false && req.body.isLogout === false){
         console.log('0-3. Access Token 만료됨. Refresh Token 조회');
-        Connection.query(`select * from login_token where access_token = '${req.signedCookies.auth.accessToken}';`, (err, data) => {
+        Connection.query(`select * from login_token where access_token = '${req.signedCookies.auth.access_token}';`, (err, data) => {
             if(err){
                 console.log('0-4. refresh token 체크 에러. 로그아웃 처리');
                 req.body.isLogout = true;
@@ -78,7 +78,7 @@ router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발
                             req.body.accessToken = accessToken(decoded.userId, process.env.JWT_SECRET_KEY);
                             res.cookie(
                                 'auth', 
-                                {user_id: req.body.user_id, accessToken : req.body.accessToken}, 
+                                {user_id: req.body.user_id, access_token : req.body.accessToken}, 
                                 {httpOnly: true, signed: true}
                             );
                             next();
@@ -94,7 +94,15 @@ router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발
             Connection.end();
         });
     }else{
-        console.log('0-3. Access Token 재발급 불필요(토큰 유효, 로그인 상태가 아님, 로그아웃 처리 예정)');
+        if(req.body.isLogout === true){
+            console.log('0-3. Access Token 재발급 불필요(로그아웃 처리 예정)');
+        }else if(req.body.isAccessVerity === null && req.body.isLogout === false){
+            console.log('0-3. Access Token 재발급 불필요(로그인 상태가 아님)')
+        }else if(req.body.isAccessVerity === true){
+            console.log('0-3. Access Token 재발급 불필요(토큰 유효)');
+        }else{
+            console.log('0-3. Access Token 재발급 불필요(원인 불명)');
+        }
         req.body.isRefreshVerify = null;
         next();
     }
@@ -104,13 +112,13 @@ router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발
 router.all('*', (req, res, next) => {
     console.log(req.body);
     if(req.body.isRefreshVerify === true){
-        console.log('0-7. AccessToken이 재발급 됨. DB의 Access Token 업로드')
+        console.log('0-7. Access Token이 재발급 됨. DB의 Access Token 업로드')
         Connection.query(`update login_token set access_token where user_id = '${req.signedCookies.auth.user_id}';`, (err) => {
             if(err){
-                console.log('0-7. 재발급된 accessToken을 DB에 업로드 실패');
+                console.log('0-7. 재발급된 Access Token을 DB에 업로드 실패');
                 console.log(err);
             }else{
-                console.log('0-7. 재발급된 accessToken을 DB에 업로드 성공');
+                console.log('0-7. 재발급된 Access Token을 DB에 업로드 성공');
             }
             Connection.end();
             next();
