@@ -79,8 +79,8 @@ router.post('/user/login', (req, res, next) => {
                     req.body.access_token = access_token;
                 }
                 Connection.end();
-                next();
             });
+            next();
     }else{
         console.log('1-7. 유저 조회에 실패(user_id 값이 없음). 토큰 발급 생략');
         req.body.access_token = null;

@@ -22,7 +22,7 @@
   <br>> 에러 발생(err.message === 'invalid token')
 
 ## Router
-* 모든 경루에서 실행시키는 방법 : 경로를 * 로 지정
+* 모든 경로에서 실행시키는 방법 : 경로를 * 로 지정
   ```javascript
   const router = require('express').Router();
   
