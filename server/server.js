@@ -21,10 +21,9 @@ const tokenAuth = require('./routers/tokenAuth'); // 토큰 유효성 검사 rou
 // 로그인 토큰 유효성 검사
 app.use(tokenAuth);
 
-// app.post('/', tokenAuth, (req, res, next) => {
-//     console.log(req.body);
-//     res.status(200).send(req.body);
-// });
+app.use('/test', (req, res) => {
+    res.status(200).send('메인페이지');
+})
 
 // 로그인 & 회원가입
 app.post('/user/login', login, (req, res) => {
