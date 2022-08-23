@@ -18,15 +18,18 @@ app.set('port', 4000);
 const login = require('./routers/login');
 const tokenAuth = require('./routers/tokenAuth'); // 토큰 유효성 검사 router
 
+// 로그인 토큰 유효성 검사
 app.use(tokenAuth);
 
-app.post('/', tokenAuth, (req, res, next) => {
-    console.log(req.body);
-    res.status(200).send(req.body);
-});
+// app.post('/', tokenAuth, (req, res, next) => {
+//     console.log(req.body);
+//     res.status(200).send(req.body);
+// });
 
+// 로그인 & 회원가입
 app.post('/user/login', login, (req, res) => {
-    res.cookie('auth', [{user_id: req.body.user_id}, {access_token: req.body.accessToken}], {httpOnly: true, signed: true})
+    console.log('Access Token 최종 확인(경로: req.body.access_token) : ' + req.body.access_token);
+    res.cookie('auth', {user_id: req.body.user_id, access_token: req.body.access_token}, {httpOnly: true, signed: true})
         .status(200).send({loginSuccess: 'login 절차 실행 완료', data: req.body});
 });
 

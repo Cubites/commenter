@@ -1,6 +1,6 @@
 const mariadb = require('mariadb/callback');
 
-const Connection = mariadb.createConnection({
+const ConnectionSecond = mariadb.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -9,4 +9,4 @@ const Connection = mariadb.createConnection({
     connectionLimit: 5
 });
 
-module.exports = Connection;
+module.exports = ConnectionSecond;
