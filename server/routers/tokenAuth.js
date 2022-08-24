@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 
-const Connection = require('../modules/Connection');
-const ConnectionSecond = require('../modules/ConnectionSecond');
+const { ConnRefreshCheck, ConnAccessUpdate, ConnRefreshDelete } = require('../modules/Connection');
 const { accessToken } = require('../modules/jwt');
 
 // 1. Access Token 유효성 검사
@@ -58,9 +57,10 @@ router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발
     if(req.body.isAccessVerity === false && req.body.isLogout === false){ // Access Token 만료
         console.log('0-2-2. Access Token 만료됨. Refresh Token 조회');
         console.log('req.signedCookies.auth : ', req.signedCookies.auth);
-        Connection.query(`select * from login_token where access_token = '${req.signedCookies.auth.access_token}';`, (err, data) => {
+        ConnRefreshCheck.query(`select * from login_token where access_token = '${req.signedCookies.auth.access_token}';`, (err, data) => {
             if(err){
                 console.log('0-2-3. Refresh Token 체크 에러. 로그아웃 처리');
+                console.log(err);
                 req.body.isLogout = true;
                 req.body.isRefreshVerify = null;
                 next();
@@ -86,9 +86,10 @@ router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발
                                 console.log('0-2-5. Refresh Token 유효. Access Token 재발급 시행');
                                 req.body.isRefreshVerify = true;
                                 req.body.accessToken = accessToken(decoded.userId, process.env.JWT_SECRET_KEY);
+                                console.log('req.body : ', req.body);
                                 res.cookie(
                                     'auth', 
-                                    {user_id: req.body.user_id, access_token : req.body.accessToken}, 
+                                    {user_id: decoded.userId, access_token : req.body.accessToken}, 
                                     {httpOnly: true, signed: true}
                                 );
                                 next();
@@ -102,7 +103,7 @@ router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발
                     });
                 }
             }
-            Connection.end();
+            ConnRefreshCheck.end();
         });
     }else{ // Access Token이 없거나 만료됨
         if(req.body.isLogout === true){
@@ -121,7 +122,7 @@ router.all('*', (req, res, next) => { // Access Token이 만료된 경우 재발
 /* 
     * isLogout = true, isRefreshVerify = null : Refresh Token 체크 에러, Refresh Token 유효성 검사 중 에러
     * isLogout = true, isRefreshVerify = false : Access Token에 맞는 Refresh Token이 없음, Refresh Token 만료
-    * isLogout = false, isRefreshVerify = null : Access Token이 없거나 만료됨
+    * isLogout = false, isRefreshVerify = null : Access Token이 없거나(isAccessVerity = null) 만료됨(isAccessVerity = false)
     * isLogout = false, isRefreshVerify = true : Refresh Token이 유효
 */
 
@@ -133,7 +134,7 @@ router.all('*', (req, res, next) => {
         console.log('0-3-2. Access Token이 재발급 됨. DB의 Access Token 업로드');
         console.log('req.body.accessToken : ', req.body.accessToken);
         console.log('req.signedCookies.auth.user_id : ', req.signedCookies.auth.user_id);
-        ConnectionSecond.query(`
+        ConnAccessUpdate.query(`
             update login_token set access_token = '${req.body.accessToken}'
                 where user_id = ${req.signedCookies.auth.user_id};`, (err) => {
             if(err){
@@ -142,22 +143,22 @@ router.all('*', (req, res, next) => {
             }else{
                 console.log('0-3-3. 재발급된 Access Token, DB에 업로드 성공');
             }
-            Connection.end();
+            ConnAccessUpdate.end();
             next();
         });
     }else if(req.body.isRefreshVerify === false){
         console.log('0-3-2. Refresh Token이 만료되어 DB에서 삭제');
-        ConnectionSecond.query(`delete from login_token where user_id = ${req.signedCookies.auth.user_id};`, (err) => {
+        console.log('req.signedCookies.auth : ', req.signedCookies.auth);
+        ConnRefreshDelete.query(`delete from login_token where user_id = ${req.signedCookies.auth.user_id};`, (err) => {
             if(err){
-                console.log('0-3-3. 만료된 Refresh Token이 정상적으로 삭제됨');
-            }else{
                 console.log('0-3-3. 만료된 Refresh Token 삭제 중 에러 발생');
                 console.log(err);
+            }else{
+                console.log('0-3-3. 만료된 Refresh Token이 정상적으로 삭제됨');
             }
-            Connection.end();
+            ConnRefreshDelete.end();
             next();
         });
-        next();
     }else{
         if(req.body.isLogout === true){
             console.log('0-3-2. Access Token 재발급 불필요(로그아웃 처리 예정)');
