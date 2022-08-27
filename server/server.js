@@ -32,9 +32,8 @@ app.post('/user/login', poolLogin, (req, res) => {
         .status(200).send({loginSuccess: true, data: req.body});
 });
 
-
 // 도서 추가
-app.get('/book/add', addbook);
+app.post('/book/add', addbook);
 
 app.listen(app.get('port'), () => {
     console.log(`app listening on port ${app.get('port')}...`);

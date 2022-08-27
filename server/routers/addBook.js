@@ -13,9 +13,10 @@ const ConnectionPool = require('../modules/ConnectionPool');
         - 검색 시작위치(start=검색위치숫자)
         - 정렬 옵션(sort=sim(유사도순) or sort=date(출간일순))
 */
-router.get('/book/add', (req, res, next) => {
+// 1. 네이버 북 API에서 책 정보 호출
+router.post('/book/add', (req, res, next) => {
     console.log("ad-1. 도서 추가");
-    console.log(req.query);
+    console.log(req.body);
     let options = {
         method: 'get',
         url: 'https://openapi.naver.com/v1/search/book.json',
@@ -23,7 +24,7 @@ router.get('/book/add', (req, res, next) => {
             'X-Naver-Client-Id':process.env.NAVER_CLIENT_ID, 
             'X-Naver-Client-Secret': process.env.NAVER_CLIENT_SECRET
         },
-        params: req.query
+        params: req.body
     };
 
     axios(options)
@@ -43,7 +44,8 @@ router.get('/book/add', (req, res, next) => {
     }
 );
 
-router.get('/book/add', async (req, res, next) => {
+// 2. API로 받아온 책 정보를 DB에 추가 
+router.post('/book/add', async (req, res, next) => {
     if(req.body.isResponseBooks){
         try{
             console.log('ad-1-2. DB에 책 정보 추가');
@@ -76,7 +78,6 @@ router.get('/book/add', async (req, res, next) => {
                     }
                 }
             });
-            console.log('bookUpload : ', bookUpload);
             console.log('ad-1-3. DB에 책 정보 추가 성공');
             res.status(200).send({
                 isResponseBooks: req.body.isResponseBooks,
