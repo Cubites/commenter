@@ -12,7 +12,7 @@ const Bookblock = styled.img`
   margin: 2%;
 `
 
-const List = ({SearchText}) => {
+const Detail = ({SearchText}) => {
   let data;
   const [Books, setBooks] = useState([]);
   useEffect(() => {    
@@ -32,4 +32,4 @@ const List = ({SearchText}) => {
   )
 }
 
-export default List
+export default Detail

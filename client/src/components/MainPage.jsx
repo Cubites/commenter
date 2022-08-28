@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Header from './Header';
 import List from './List';
 import Detail from './Detail';
+import Login from './Login';
 
 const MainPage = () => {
-  let href = window.location.href.split("/")[3];
+  let Url = new URL(window.location.href)
+  let href = Url.pathname;
   const [SearchText, setSearchText] = useState("");  
-  if(href = "detail"){
+  console.log(href);
+  if(href === "/detail"){
     return (
       <>
         <Header setSearchText={setSearchText}/>
         
         <Detail/>
+      </>
+    )
+  }else if(href === "/login"){
+    return (
+      <>
+        <Header setSearchText={setSearchText}/>
+        
+        <Login/>
       </>
     )
   }else{
