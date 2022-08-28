@@ -13,7 +13,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET_KEY));
 
 app.set('port', 4000);
 
-const { accessToken, refressToken } = require('./routes/jwt');
+// const { accessToken, refressToken } = require('./routes/jwt');
 
 // const Mariadb = mariadb.createPool({
 //     host: process.env.DB_HOST,
@@ -23,13 +23,13 @@ const { accessToken, refressToken } = require('./routes/jwt');
 // });
 
 // Router
-const login = require('./routes/login.js');
+// const login = require('./routes/login.js');
 
-app.use('/', (req, res, next) => {
-    console.log(req.signedCookies.cookie);
-    // let isLogin = refressToken();
-    next();
-});
+// app.use('/', (req, res, next) => {
+//     console.log(req.signedCookies.cookie);
+//     // let isLogin = refressToken();
+//     next();
+// });
 
 // app.use('/', login);
 // app.post('/user/login', login, (req, res) => {
@@ -47,11 +47,12 @@ app.use('/', (req, res, next) => {
 //     //     .send({loginSuccess: true});
 // });
 
+
 // 1.책 조회
-app.get('/book/search', (req, res) => {
+app.post('/book/search', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.search);
-    console.log(req.query.sort);
+    console.log(req.body.search);
+    console.log(req.body.sort);
 
     let options = {
         method: 'get',
@@ -60,7 +61,7 @@ app.get('/book/search', (req, res) => {
             'X-Naver-Client-Id':process.env.NAVER_CLIENT_ID, 
             'X-Naver-Client-Secret': process.env.NAVER_CLIENT_SECRET
         },
-        params: { query: req.query.name }
+        params: { query: req.body.search }
     };
 
     axios(options)
@@ -73,9 +74,9 @@ app.get('/book/search', (req, res) => {
 );
 
 // 2. 책 정보
-app.get('/book/info', (req, res) => {
+app.post('/book/info', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.id);
+    console.log(req.body.id);
 
     let data = {
         id : '1',
@@ -88,11 +89,13 @@ app.get('/book/info', (req, res) => {
     res.send(200, data);
 });
 
+
+
 // 3. 코멘트 조회
-app.get('/comment/info', (req, res) => {
+app.post('/comment/info', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.book_id);
-    console.log(req.query.sort);
+    console.log(req.body.book_id);
+    console.log(req.body.sort);
 
     let data = {
         book_id : '1',
@@ -107,11 +110,11 @@ app.get('/comment/info', (req, res) => {
 });
 
 // 4. 코멘트 등록
-app.get('/comment/insert', (req, res) => {
+app.post('/comment/insert', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.book_id);
-    console.log(req.query.content);
-    console.log(req.query.ip);
+    console.log(req.body.book_id);
+    console.log(req.body.content);
+    console.log(req.body.ip);
     let data = {
         success : 0,
         fail_reason : ''
@@ -122,10 +125,10 @@ app.get('/comment/insert', (req, res) => {
 
 
 // 5. 코멘트 신고
-app.get('/comment/insert', (req, res) => {
+app.post('/comment/insert', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.comment_id);
-    console.log(req.query.comment_content);
+    console.log(req.body.comment_id);
+    console.log(req.body.comment_content);
 
     let data = {
         success : 0,
@@ -137,9 +140,9 @@ app.get('/comment/insert', (req, res) => {
 
 
 // 6. 코멘트 삭제
-app.get('/comment/delete', (req, res) => {
+app.post('/comment/delete', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.comment_id);
+    console.log(req.body.comment_id);
 
     let data = {
         success : 0,
@@ -150,11 +153,11 @@ app.get('/comment/delete', (req, res) => {
 });
 
 // 7. 로그인
-app.get('/user/login', (req, res) => {
+app.post('/user/login', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.login_method);
-    console.log(req.query.user_code);
-    let user_id = req.query.user_code;
+    console.log(req.body.login_method);
+    console.log(req.body.user_code);
+    let user_id = req.body.user_code;
     
     let data = {
         user_id : user_id,
@@ -166,9 +169,9 @@ app.get('/user/login', (req, res) => {
 });
 
 // 8. 마이페이지
-// app.get('/user/info', (req, res) => {
+// app.post('/user/info', (req, res) => {
 //     console.log("서버입장");
-//     console.log(req.query.user_id);
+//     console.log(req.body.user_id);
 
 //     let data = {
 //         comment_num : '50',
@@ -181,10 +184,10 @@ app.get('/user/login', (req, res) => {
 // });
 
 // 9. 유저 정보 수정
-app.get('/user/update', (req, res) => {
+app.post('/user/update', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.user_nick);
-    console.log(req.query.user_profile);
+    console.log(req.body.user_nick);
+    console.log(req.body.user_profile);
 
     let data = {
         success : 0,
@@ -194,10 +197,10 @@ app.get('/user/update', (req, res) => {
     res.send(200, data);
 });
 // 10. 문의 전송
-app.get('/qna/insert', (req, res) => {
+app.post('/qna/insert', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.qna_reason);
-    console.log(req.query.qna_content);
+    console.log(req.body.qna_reason);
+    console.log(req.body.qna_content);
 
     let data = {
         success : 0,
@@ -208,9 +211,9 @@ app.get('/qna/insert', (req, res) => {
 });
 
 // 11. 문의 조회
-app.get('/qna/search', (req, res) => {
+app.post('/qna/search', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.user_id);
+    console.log(req.body.user_id);
 
     let data = {
         report_date : '2019.05.21',
@@ -222,9 +225,9 @@ app.get('/qna/search', (req, res) => {
 });
 
 // 12. 문의 상세 조회
-app.get('/qna/info', (req, res) => {
+app.post('/qna/info', (req, res) => {
     console.log("서버입장");
-    console.log(req.query.qna_id);
+    console.log(req.body.qna_id);
 
     let data = {
         report_date : '2019.05.21',

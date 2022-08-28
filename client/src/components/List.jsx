@@ -16,7 +16,7 @@ const List = ({SearchText}) => {
   const [Books, setBooks] = useState([]);
   useEffect(() => {    
     if(SearchText != ""){
-      axios.get(`/book/search?name=${SearchText}`)
+      axios.post(`/book/search`, {search: SearchText, sort: 0})
         .then(res => {
           setBooks(res.data.data);
         })

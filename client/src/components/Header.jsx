@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 const Headerbar = styled.div`
   width: 100%;
   height: 80px;
@@ -53,9 +54,15 @@ const SearchButton = styled.button`
 const LoginButton = styled.img`
   cursor: pointer;
 `;
+const LoginSuccess = styled.button`
 
-const Header = ({setSearchText}) => {
+
+`;
+
+const Header = ({setSearchText , IsLogin, IsLoginHandler }) => {
   const [SearchWord, setSearchWord] = useState("");
+  
+  const navigate = useNavigate();
   const SearchWordHandler = (e) => {
     e.preventDefault();
     setSearchWord(e.currentTarget.value);
@@ -64,6 +71,26 @@ const Header = ({setSearchText}) => {
     e.preventDefault();
     setSearchText(SearchWord);
   }
+  console.log("Token: " + Cookies.get('login_token'));
+
+
+
+  const MoveLoginPage = (e) => {
+    e.preventDefault();
+    navigate('/login');
+  }
+
+  const UserLogout = (e) => {
+    e.preventDefault();
+    Cookies.remove("login_token");
+    Cookies.remove("user_nick");
+    IsLoginHandler(Cookies.get('login_token'));
+    navigate('/');
+  }
+
+  let loginCookie = Cookies.get('login_token');
+  let user_nick = Cookies.get('user_nick');
+  
   return (
     <Headerbar>
       <Logo src="images/logo_white.png"/>
@@ -71,7 +98,11 @@ const Header = ({setSearchText}) => {
         <SearchInput value={SearchWord} onChange={SearchWordHandler}/>
         <SearchButton type="submit"><img src="images/search_icon.png"/></SearchButton>
       </Searchbar>
-      <LoginButton src="images/login_img.png"/>
+      {
+        IsLogin ?
+        <LoginSuccess onClick={UserLogout}>로그아웃</LoginSuccess> :
+        <LoginButton onClick={MoveLoginPage} src="images/login_img.png"/>
+      }
     </Headerbar>
   )
 }

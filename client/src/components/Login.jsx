@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+
+import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 const Container = styled.div`
   padding-left: 15%;
@@ -12,7 +14,7 @@ let naverClientId = "wNVVHJDXsM2ml9VpjXRN";
 let kakaoClientId = "53826ce023c535254f5d2424b92e9421";
 let callbackUrl =  "http://localhost:3000";
 
-const Login = () => {
+const Login = ({ IsLoginHandler }) => {
     const navigate = useNavigate();
 
     // Naver sdk import
@@ -38,7 +40,7 @@ const Login = () => {
         isPopup: false, // 로그인 팝업여부
         loginButton: {
           color: "green", // 색상(white, green)
-          type: 3, // 버튼타입(1,2,3)
+          type: 1, // 버튼타입(1,2,3)
           height: 60, // 배너 및 버튼 높이
         }        
       });             
@@ -50,7 +52,6 @@ const Login = () => {
           naverLogin.getLoginStatus((status) => {
             if (status) {
               const {id} = naverLogin.user;
-              alert(id);
               callLogin('N',id);
             }          
           });
@@ -63,12 +64,14 @@ const Login = () => {
     // 로그인 부분 자동으로 메인으로 이동
     const callLogin = (type, id) => {
       console.log(id);
-      axios.get('/user/login?login_method='+type+'&user_code='+id)
+      axios.post('/user/login',{login_method: type, user_code: id})
       .then(res => {
         let {user_id, login_token, user_nick} = res.data;        
         // alert(user_id+"+"+login_token+"+"+user_nick);
         document.cookie = "login_token=" + login_token;
         document.cookie = "user_nick=" + user_nick;
+        let cookieData = Cookies.get('login_token');
+        IsLoginHandler(cookieData);
         navigate('/');
       })
       .catch(err => console.log("err : " + err));
