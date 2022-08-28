@@ -13,10 +13,10 @@ const ConnectionPool = require('../modules/ConnectionPool');
         - 검색 시작위치(start=검색위치숫자)
         - 정렬 옵션(sort=sim(유사도순) or sort=date(출간일순))
 */
+
 // 1. 네이버 북 API에서 책 정보 호출
 router.post('/book/add', (req, res, next) => {
     console.log("ad-1. 도서 추가");
-    console.log(req.body);
     let options = {
         method: 'get',
         url: 'https://openapi.naver.com/v1/search/book.json',
@@ -31,7 +31,7 @@ router.post('/book/add', (req, res, next) => {
         .then((rs) => {
             console.log("ad-1-1. api 데이터 요청 성공");
             req.body.isResponseBooks = true;
-            console.log(rs.data.items[0]);
+            // console.log(rs.data.items[0]);
             req.body.items = rs.data.items;
             next();
         })
@@ -56,7 +56,7 @@ router.post('/book/add', async (req, res, next) => {
                 console.log('item.title :', item.title);
                 try{
                     let checkDuplication = conn.query(`select count(*) from book where isbn = ${item.isbn}`);
-                    console.log(checkDuplication);
+                    // console.log('checkDuplication : ', checkDuplication);
                     await conn.query(`
                         insert book (isbn, book_title, image_url, author, publisher, publication, discount, sale_link)
                             value (?, ?, ?, ?, ?, ?, ?, ?)`, [
