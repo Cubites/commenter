@@ -102,10 +102,18 @@ router.post('/user/login', async (req, res, next) => {
         try{
             const conn = await ConnectionPool.getConnection();
             try{
+                console.log('1-3-2. 로그인 토큰 정보가 존재하는지 확인');
+                const tokenCheck = await conn.query(`select * from login_token where user_id = ${req.body.user_id}`);
+                console.log('tokenCheck : ', tokenCheck);
+                if(tokenCheck.length !== 0){
+                    console.log('1-3-3. 기존 로그인 정보가 존재. 저장된 토큰 삭제 후, 토큰 저장');
+                    await conn.query(`delete from login_token where user_id = ${req.body.user_id}`);
+                    req.body.access_token = null;
+                }
                 const tokenSaveResult = await conn.query(
                     `insert login_token (user_id, access_token, refresh_token, refresh_expire) values (?, ?, ?, ?);`, 
                     [req.body.user_id, access_token, refresh_token.refressToken, refresh_token.expire]);
-                console.log('1-3-2. 토큰 저장 성공');
+                console.log('1-3-4. 토큰 저장 성공');
                 console.log('tokenSaveResult : ', tokenSaveResult)
                 req.body.access_token = access_token;
                 next();
