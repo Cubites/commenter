@@ -2,3 +2,4 @@
 .env
 /config
 /script
+/query_creator

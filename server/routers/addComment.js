@@ -13,7 +13,7 @@ router.post('/comment/insert', async (req, res, next) => {
             let newCommentId = commentCount[0].last_comment_id + 1;
             await conn.query(`
                 insert comment (comment_id, user_id, isbn, comment_content, comment_date) 
-                    values (${newCommentId}, ${req.body.user_id}, '${req.body.isbn}', '${req.body.content}', DATE_FORMAT('${nowTime()}', '%Y-%m-%d %H:%i:%s.%f'));
+                    values (${newCommentId}, ${req.body.user_id}, '${req.body.isbn}', '${req.body.content}', DATE_FORMAT('${nowTime()}', '%Y-%m-%d %H:%i:%s'));
             `);
             conn.release();
             res.status(200).send({success: true, reason: null});

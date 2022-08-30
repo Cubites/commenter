@@ -22,7 +22,7 @@ const addComment = require('./routers/addComment');
 const bookDetail = require('./routers/bookDetail');
 
 // 0. 로그인 토큰 유효성 검사
-app.use(poolTokenAuth);
+// app.use(poolTokenAuth);
 
 app.use('/test', (req, res) => {
     res.status(200).send(req.body);
