@@ -31,8 +31,8 @@ router.post('/book/add', (req, res, next) => {
         .then((rs) => {
             console.log("ad-1-1. api 데이터 요청 성공");
             req.body.isResponseBooks = true;
-            // console.log(rs.data.items[0]);
             req.body.items = rs.data.items;
+            // res.status(200).send(rs.data.items);
             next();
         })
         .catch(err => {

@@ -60,12 +60,12 @@ router.post('/user/login', async (req, res, next) => {
         try{
             const conn = await ConnectionPool.getConnection();
             try{
-                const userCount = await conn.query(`select Max(user_id) as last_user_num from user;`);
+                const userCount = await conn.query(`select Max(user_id) as last_user_num from user_info;`);
                 let newUserId = userCount[0].last_user_num + 1;
                 console.log('1-2-3. 신규 유저 아이디 생성 완료 : ', newUserId);
                 try{
                     const signUpResult = await conn.query(`
-                        insert user(user_id, nickname, ${req.body.login_method}_token)
+                        insert user_info (user_id, nickname, ${req.body.login_method}_token)
                             values (${newUserId}, '${(Math.round(Math.random() * 10000000))}', '${req.body.user_code}');`);
                     console.log('1-2-4. 신규 유저 정보 저장 완료');
                     console.log('signUpResult : ', signUpResult);

@@ -1,4 +1,6 @@
 const mariadb = require('mariadb');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const ConnectionPool = mariadb.createPool({
     host: process.env.DB_HOST,
@@ -6,6 +8,7 @@ const ConnectionPool = mariadb.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     bigIntAsNumber: true,
+    timezone: 'Asia/Seoul',
     connectionLimit: 10
 });
 
