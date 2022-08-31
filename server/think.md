@@ -44,3 +44,27 @@
       <br>> wait_timeout 값(단위: 초) 확인 (기본값 : 128800초; 8시간)
 
 ### SqlError: Cannot execute new commands: connection closed
+
+### DB의 시간 데이터를 불러오면 UTC 시간대로 바뀌는 문제
+#### 시도 방법
+1. connection 파라미터 값에 <code>timezone: 'Asia/Seoul'</code> 추가
+  <br>> 해결안됨
+2. query 문으로 DB의 시간대 변경
+  ```sql
+  SHOW GLOBAL VARIABLES LIKE 'time_zone';
+  -- root 계정임에도 권한 에러 발생
+  ```
+3. my.cnf 파일의 time_zone 값 변경
+  <br>> AWS RDS는 my.cnf 파일을 직접 수정할 수 없음
+4. [AWS RDS 한정] RDS 관리 페이지에서 시간대를 'Asia/Seoul'로 바꾼 파라미터 그룹을 새로만들고 DB에 적용 후 재부팅
+  <br>> DB 시간대는 정상적으로 바뀐 것을 확인
+  <br>> 하지만 nodejs로 불러오면 값이 UTC 시간대로 바뀌어버림
+5. connection 파라미터에 다음 값 추가
+  ```sql
+  dateStrings: [
+    'DATE',
+    'DATETIME',
+  ]
+  ```
+  <br>> 원래 DB값을 불러올 때 시간 값을 읽으면 UTC로 변환함
+  <br>> 위 값을 추가하면 시간 값을 STRING으로 받으므로 UTC로 변환되지 않음

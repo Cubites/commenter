@@ -16,7 +16,7 @@ const ConnectionPool = require('../modules/ConnectionPool');
 
 // 1. 네이버 북 API에서 책 정보 호출
 router.post('/book/add', (req, res, next) => {
-    console.log("ad-1. 도서 추가");
+    console.log("admin_1-1. 도서 추가");
     let options = {
         method: 'get',
         url: 'https://openapi.naver.com/v1/search/book.json',
@@ -29,14 +29,14 @@ router.post('/book/add', (req, res, next) => {
 
     axios(options)
         .then((rs) => {
-            console.log("ad-1-1. api 데이터 요청 성공");
+            console.log("admin_1-1-1. api 데이터 요청 성공");
             req.body.isResponseBooks = true;
             req.body.items = rs.data.items;
             // res.status(200).send(rs.data.items);
             next();
         })
         .catch(err => {
-            console.log('add-1-1. 책 정보 요청 에러');
+            console.log('admin_1-1-1. 책 정보 요청 에러');
             res.send(err);
             req.body.isResponseBooks = false;
             next();
@@ -48,15 +48,13 @@ router.post('/book/add', (req, res, next) => {
 router.post('/book/add', async (req, res, next) => {
     if(req.body.isResponseBooks){
         try{
-            console.log('ad-1-2. DB에 책 정보 추가');
+            console.log('admin_1-2. DB에 책 정보 추가');
             // res.status(200).send(req.body.items);
             const conn = await ConnectionPool.getConnection();
             console.log('req.body.items : ', req.body.items);
             req.body.items.forEach(async (item, index) => {
                 console.log('item.title :', item.title);
                 try{
-                    let checkDuplication = conn.query(`select count(*) from book where isbn = ${item.isbn}`);
-                    // console.log('checkDuplication : ', checkDuplication);
                     await conn.query(`
                         insert book (isbn, book_title, image_url, author, publisher, publication, discount, sale_link)
                             value (?, ?, ?, ?, ?, ?, ?, ?)`, [
@@ -78,7 +76,7 @@ router.post('/book/add', async (req, res, next) => {
                     }
                 }
             });
-            console.log('ad-1-3. DB에 책 정보 추가 성공');
+            console.log('admin_1-2-1. DB에 책 정보 추가 성공');
             res.status(200).send({
                 isResponseBooks: req.body.isResponseBooks,
                 bookAddSuccess: true,
@@ -86,7 +84,7 @@ router.post('/book/add', async (req, res, next) => {
             });
             conn.release();
         }catch(err){
-            console.log('ad-1-3. DB 연결 에러');
+            console.log('admin_1-2-1. DB 연결 에러');
             console.log(err);
             res.status(400).send({
                 isResponseBooks: req.body.isResponseBooks,
