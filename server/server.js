@@ -22,7 +22,7 @@ const addComment = require('./routers/addComment');
 const bookDetail = require('./routers/bookDetail');
 
 // 0. 로그인 토큰 유효성 검사
-// app.use(poolTokenAuth);
+app.use(poolTokenAuth);
 
 app.use('/test', (req, res) => {
     res.status(200).send(req.body);
@@ -32,7 +32,8 @@ app.use('/test', (req, res) => {
 app.post('/user/login', poolLogin, (req, res) => {
     console.log('Access Token 최종 확인 : ' + req.body.access_token);
     res.cookie('auth', {user_id: req.body.user_id, access_token: req.body.access_token}, {httpOnly: true, signed: true})
-        .status(200).send({loginSuccess: true, data: req.body});
+        // .status(200).send({loginSuccess: true, data: req.body});
+        .status(200).send({loginSuccess: true});
 });
 
 // ad-1. 도서 추가

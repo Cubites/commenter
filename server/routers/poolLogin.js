@@ -24,7 +24,7 @@ router.post('/user/login', async (req, res, next) => {
         const conn = await ConnectionPool.getConnection();
         try{
             let userInfo = await conn.query(`
-                select user_id, ${req.body.login_method}_token as token from user 
+                select user_id, ${req.body.login_method}_token as token from user_info 
                     where ${req.body.login_method}_token = '${req.body.user_code}';`);
             if(userInfo.length !== 0){
                 console.log('1-1-1. 기존 유저임을 확인');
@@ -60,13 +60,13 @@ router.post('/user/login', async (req, res, next) => {
         try{
             const conn = await ConnectionPool.getConnection();
             try{
-                const userCount = await conn.query(`select Max(user_id) as last_user_num from user_info;`);
-                let newUserId = userCount[0].last_user_num + 1;
+                const userCount = await conn.query(`select user_id as last_ui from user_info order by user_id desc limit 1;`);
+                let newUserId = `UI${('0000000000' + (Number((userCount[0].last_ui).slice(-10)) + 1)).slice(-10)}`;
                 console.log('1-2-3. 신규 유저 아이디 생성 완료 : ', newUserId);
                 try{
                     const signUpResult = await conn.query(`
                         insert user_info (user_id, nickname, ${req.body.login_method}_token)
-                            values (${newUserId}, '${(Math.round(Math.random() * 10000000))}', '${req.body.user_code}');`);
+                            values ('${newUserId}', '${(Math.round(Math.random() * 10000000))}', '${req.body.user_code}');`);
                     console.log('1-2-4. 신규 유저 정보 저장 완료');
                     console.log('signUpResult : ', signUpResult);
                     req.body.user_id = newUserId;
@@ -95,7 +95,7 @@ router.post('/user/login', async (req, res, next) => {
 router.post('/user/login', async (req, res, next) => {
     console.log('1-3. 토큰 발급');
     console.log('req.body.user_id : ', req.body.user_id);
-    if(req.body.user_id > 0){
+    if(req.body.user_id !== null){
         console.log('1-3-1. 유저 조회에 성공(user_id가 있음). 토큰 발급');
         let access_token = accessToken(req.body.user_id, process.env.JWT_SECRET_KEY);
         let refresh_token = refressToken(req.body.user_id, access_token, process.env.JWT_SECRET_KEY);
@@ -103,11 +103,11 @@ router.post('/user/login', async (req, res, next) => {
             const conn = await ConnectionPool.getConnection();
             try{
                 console.log('1-3-2. 로그인 토큰 정보가 존재하는지 확인');
-                const tokenCheck = await conn.query(`select * from login_token where user_id = ${req.body.user_id}`);
+                const tokenCheck = await conn.query(`select * from login_token where user_id = '${req.body.user_id}'`);
                 console.log('tokenCheck : ', tokenCheck);
                 if(tokenCheck.length !== 0){
                     console.log('1-3-3. 기존 로그인 정보가 존재. 저장된 토큰 삭제 후, 토큰 저장');
-                    await conn.query(`delete from login_token where user_id = ${req.body.user_id}`);
+                    await conn.query(`delete from login_token where user_id = '${req.body.user_id}'`);
                     req.body.access_token = null;
                 }
                 const tokenSaveResult = await conn.query(

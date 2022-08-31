@@ -106,7 +106,7 @@ router.all('*', async (req, res, next) => { // Access Token이 만료된 경우 
         try{
             const conn = await ConnectionPool.getConnection();
             const data = await conn.query(`select * from login_token where user_id = '${req.signedCookies.auth.user_id}';`);
-            console.log('0-3-2. DB에서 Access Token 조회 결과 : ', data);
+            console.log('0-3-2. DB에서 Access Token 조회 결과 : ', data[0]);
             if(data.length === 0){
                 console.log('0-3-3. Access Token에 맞는 Refresh Token이 없음. 로그아웃 처리');
                 req.body.needToClearCookie = true;
@@ -181,7 +181,7 @@ router.all('*', async (req, res, next) => {
             try{
                 const data = await conn.query(`
                     update login_token set access_token = '${req.body.access_token}'
-                        where user_id = ${req.signedCookies.auth.user_id};`);
+                        where user_id = '${req.signedCookies.auth.user_id}';`);
                 console.log('0-4-2. 재발급된 Access Token, DB에 업로드 성공');
                 console.log(data);
                 req.body.signInSkip = true;
@@ -218,10 +218,10 @@ router.all('*', async (req, res, next) => {
             const conn = await ConnectionPool.getConnection();
             if(req.signedCookies.auth !== undefined){
                 if(req.signedCookies.auth.user_id !== undefined){
-                    const data = await conn.query(`delete from login_token where user_id = ${req.signedCookies.auth.user_id};`);
+                    const data = await conn.query(`delete from login_token where user_id = '${req.signedCookies.auth.user_id}';`);
                 }
                 if(req.signedCookies.auth.access_token !== undefined){
-                    const data2 = await conn.query(`delete from login_token where access_token = ${req.signedCookies.auth.access_token};`);
+                    const data2 = await conn.query(`delete from login_token where access_token = '${req.signedCookies.auth.access_token}';`);
                 }
             }
             console.log('0-5-2. Refresh Token이 정상적으로 삭제됨');

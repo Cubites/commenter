@@ -8,8 +8,13 @@ const ConnectionPool = mariadb.createPool({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     bigIntAsNumber: true,
-    timezone: 'Asia/Seoul',
-    connectionLimit: 10
+    // timezone: 'Asia/Seoul',
+    dateStrings: [
+        'DATE',
+        'DATETIME'
+    ],
+    connectionLimit: 5,
+    idleTimeout: 30000,
 });
 
 module.exports = ConnectionPool;
