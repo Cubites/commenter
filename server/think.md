@@ -45,6 +45,10 @@
 
 ### SqlError: Cannot execute new commands: connection closed
 
+### SyntaxError: Unexpected token / in JSON at position 118
+* 원인 : Postman에서 요청 body에 주석을 넣어서 발생한 에러
+* 해결 : 요청 body에서 주석을 지움
+
 ### DB의 시간 데이터를 불러오면 UTC 시간대로 바뀌는 문제
 #### 시도 방법
 1. connection 파라미터 값에 <code>timezone: 'Asia/Seoul'</code> 추가
