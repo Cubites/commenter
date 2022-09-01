@@ -86,6 +86,7 @@ router.post('/book/add', async (req, res, next) => {
         }catch(err){
             console.log('admin_1-2-1. DB 연결 에러');
             console.log(err);
+            conn.release();
             res.status(400).send({
                 isResponseBooks: req.body.isResponseBooks,
                 bookAddSuccess: false,

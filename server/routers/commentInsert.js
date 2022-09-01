@@ -20,6 +20,7 @@ router.post('/comment/insert', async (req, res, next) => {
         }catch(err){
             console.log('3-1-1. 코멘트 추가 에러');
             console.log(err);
+            conn.release();
             res.status(404).send({success: false, reason: err});
         }
     }else{
