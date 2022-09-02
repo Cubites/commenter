@@ -116,24 +116,28 @@ router.post('/user/login', async (req, res, next) => {
                 console.log('1-3-4. 토큰 저장 성공');
                 console.log('tokenSaveResult : ', tokenSaveResult)
                 req.body.access_token = access_token;
-                next();
+                // next();
             }catch(err){
                 console.log('1-3-2. 토큰 저장 실패, 재 로그인 권장');
                 console.log(err);
                 req.body.access_token = null;
-                next();
+                // next();
             }
             conn.release();
         }catch(err){
             console.log('1-3-2. DB 연결 에러');
             console.log(err);
-            next();
+            // next();
         }
     }else{
         console.log('1-3-1. 유저 조회에 실패(user_id 값이 없음). 토큰 발급 생략');
         req.body.access_token = null;
-        next();
+        // next();
     }
+    console.log('Access Token 최종 확인 : ' + req.body.access_token);
+    res.cookie('auth', {user_id: req.body.user_id, access_token: req.body.access_token}, {httpOnly: true, signed: true})
+        // .status(200).send({loginSuccess: true, data: req.body});
+        .status(200).send({loginSuccess: true, isLogout: req.body.isLogout});
 });
 
 module.exports = router;

@@ -42,6 +42,11 @@ router.post('/comment/info', async (req, res, next) => {
                         ` : 
                         ``
                     }
+                    , (
+                        SELECT 1
+                        FROM report rp
+                        WHERE cm.comment_id = rp.comment_id
+                    ) AS is_reported
                 FROM comment cm
                 WHERE isbn = '${req.body.isbn}'
                 ORDER BY ${req.body.sort === 0 ? `cm.comment_date` : `comment_like_num`} DESC
@@ -50,6 +55,10 @@ router.post('/comment/info', async (req, res, next) => {
             res.status(200).send(commentData);
         }else{
             console.log('4-1-1. 마이 페이지에서의 요청. 해당 유저가 작성한 코멘트 조회');
+            if(req.body.user_id === null){
+                console.log('4-1-2. 로그인 상태가 아님. 에러 출력');
+                res.status(404).send({success: false, reason: '잘못된 접근입니다.'});
+            }
             const commentData = await conn.query(`
             SELECT 
                 cm.comment_id
