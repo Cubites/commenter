@@ -14,12 +14,13 @@ app.set('port', 4000);
 // Router
 const poolTokenAuth = require('./routers/poolTokenAuth');
 const addbook = require('./routers/addBook');
+
 const bookSearch = require('./routers/bookSearch');
 const bookInfo = require('./routers/bookInfo');
 const commentInsert = require('./routers/commentInsert');
 const commentInfo = require('./routers/commentInfo');
-
-
+const commentReport = require('./routers/commentReport');
+const commentDelete = require('./routers/commentDelete');
 const userLogin = require('./routers/userLogin');
 const userInfo = require('./routers/userInfo');
 
@@ -50,8 +51,10 @@ app.post('/comment/insert', commentInsert);
 app.post('/comment/info', commentInfo);
 
 // 5. 코멘트 신고
+app.post('/comment/report', commentReport);
 
 // 6. 코멘트 삭제
+app.post('/comment/delete', commentDelete);
 
 // 7. 로그인 & 회원가입
 app.post('/user/login', userLogin);

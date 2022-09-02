@@ -21,6 +21,7 @@ router.post('/comment/insert', async (req, res, next) => {
                 insert comment (comment_id, user_id, isbn, comment_content, comment_date) 
                     values ('${newCommentId}', '${req.body.user_id}', '${req.body.isbn}', '${req.body.content}', DATE_FORMAT('${nowTime()}', '%Y-%m-%d %H:%i:%s'));
             `);
+            res.status(200).send({success: true, reason: null});
         }else{
             console.log('3-1-2. 비회원 코멘트 작성');
             const isWriteBefore = await conn.query(`SELECT guest_ip, comment_count FROM guest WHERE guest_ip = '${req.body.ip}'`);
