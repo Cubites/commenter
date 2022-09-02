@@ -3,7 +3,11 @@ const router = require('express').Router();
 const ConnectionPool = require('../modules/ConnectionPool');
 
 router.post('/user/info', async (req, res, next) => {
-    console.log('8. 마이 페이지 조회');
+    console.log('8-1. 마이 페이지 조회');
+    if(req.body.user_id === null){
+        console.log('8-1-1. 로그인 상태가 아님. 에러 출력');
+        res.status(404).send({success: false, reason: '잘못된 접근입니다.'});
+    }
     try{
         const conn = await ConnectionPool.getConnection();
         const userData = await conn.query(`

@@ -18,8 +18,14 @@ const bookSearch = require('./routers/bookSearch');
 const bookInfo = require('./routers/bookInfo');
 const commentInsert = require('./routers/commentInsert');
 const commentInfo = require('./routers/commentInfo');
+
+
 const userLogin = require('./routers/userLogin');
 const userInfo = require('./routers/userInfo');
+
+
+const qnaSearch = require('./routers/qnaSearch');
+const qnaInfo = require('./routers/qnaInfo');
 
 // 0. 로그인 토큰 유효성 검사
 app.use(poolTokenAuth);
@@ -48,12 +54,7 @@ app.post('/comment/info', commentInfo);
 // 6. 코멘트 삭제
 
 // 7. 로그인 & 회원가입
-app.post('/user/login', userLogin, (req, res) => {
-    console.log('Access Token 최종 확인 : ' + req.body.access_token);
-    res.cookie('auth', {user_id: req.body.user_id, access_token: req.body.access_token}, {httpOnly: true, signed: true})
-        // .status(200).send({loginSuccess: true, data: req.body});
-        .status(200).send({loginSuccess: true});
-});
+app.post('/user/login', userLogin);
 
 // 8. 마이페이지 정보(유저 정보) 조회
 app.post('/user/info', userInfo);
@@ -63,8 +64,10 @@ app.post('/user/info', userInfo);
 // 10. 문의 전송
 
 // 11. 문의 조회
+app.post('/qna/search', qnaSearch);
 
 // 12. 문의 상세 조회
+app.post('/qna/info', qnaInfo);
 
 app.listen(app.get('port'), () => {
     console.log(`app listening on port ${app.get('port')}...`);
