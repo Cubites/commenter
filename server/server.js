@@ -23,7 +23,7 @@ const commentReport = require('./routers/commentReport');
 const commentDelete = require('./routers/commentDelete');
 const userLogin = require('./routers/userLogin');
 const userInfo = require('./routers/userInfo');
-
+const userUpdate = require('./routers/userUpdate');
 
 const qnaSearch = require('./routers/qnaSearch');
 const qnaInfo = require('./routers/qnaInfo');
@@ -63,6 +63,7 @@ app.post('/user/login', userLogin);
 app.post('/user/info', userInfo);
 
 // 9. 유저 정보 수정
+app.post('/user/update', userUpdate);
 
 // 10. 문의 전송
 
