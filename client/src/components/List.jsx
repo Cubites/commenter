@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 const Container = styled.div`
-  padding-left: 15%;
-  padding-right: 15%;
+  text-align: center;
   height: 500px;
 `
 const Bookblock = styled.img`
-  width: 15%;
+  width: 5vw;
+  min-width: 180px;
   margin: 2%;
 `
 

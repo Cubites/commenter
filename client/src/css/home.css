@@ -1,0 +1,11 @@
+html{overflow:hidden;}
+
+.up {
+    animation: identifier 1s forwards alternate;
+}
+
+@keyframes identifier {    
+    to {
+        margin-top:-90vh;       
+    }
+}

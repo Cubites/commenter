@@ -7,7 +7,6 @@ import MainPage from './components/MainPage';
 const App = () => {
   const [IsLogin, setIsLogin] = useState(false);
   const IsLoginHandler = (loginCookie) =>{ 
-    console.log("AAA",loginCookie)
     if(loginCookie != null){
       setIsLogin(true);
       return;
