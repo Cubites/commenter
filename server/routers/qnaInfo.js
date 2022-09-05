@@ -16,6 +16,7 @@ router.post('/qna/info', async (req, res, next) => {
     }catch(err){
         console.log('12-1-2. 문의 상세내용 조회 중 에러 발생');
         console.log(err);
+        res.status(404).send({success: false, reason: err});
     }
 });
 

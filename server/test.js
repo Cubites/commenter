@@ -4,5 +4,10 @@ dotenv.config();
 
 console.log('----------------------------------------------테스트----------------------------------------------');
 
-const nowDate = new Date('2022-08-01');
-console.log(nowDate.getTime());
+
+const ddd = {aaa: null};
+if(ddd.aaa){
+    console.log('true?');
+}else{
+    console.log('false');
+}

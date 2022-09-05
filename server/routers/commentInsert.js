@@ -7,7 +7,6 @@ const nowTime = require('../modules/nowTime');
 router.post('/comment/insert', async (req, res, next) => {
     console.log('3-1. 코멘트 추가');
     try{
-        console.log('3-1-1. 회원 코멘트 추가');
         const conn = await ConnectionPool.getConnection();
         const commentCount = await conn.query(`
             SELECT comment_id AS last_comment_id FROM comment
@@ -15,15 +14,15 @@ router.post('/comment/insert', async (req, res, next) => {
         `);
         let newCommentId = `CM${('0000000000' + (Number(commentCount[0].last_comment_id.slice(-10))+1)).slice(-10)}`;
         
-        if(req.body.user_id !== null){
-            console.log('3-1-2. 회원 코멘트 작성');
+        if(req.body.user_id !== undefined){
+            console.log('3-1-1. 회원 코멘트 작성');
             await conn.query(`
                 insert comment (comment_id, user_id, isbn, comment_content, comment_date) 
                     values ('${newCommentId}', '${req.body.user_id}', '${req.body.isbn}', '${req.body.content}', DATE_FORMAT('${nowTime()}', '%Y-%m-%d %H:%i:%s'));
             `);
             res.status(200).send({success: true, reason: null});
         }else{
-            console.log('3-1-2. 비회원 코멘트 작성');
+            console.log('3-1-1. 비회원 코멘트 작성');
             const isWriteBefore = await conn.query(`SELECT guest_ip, comment_count FROM guest WHERE guest_ip = '${req.body.ip}'`);
             if(isWriteBefore.length === 0 || isWriteBefore[0].comment_count !== 3){
                 if(isWriteBefore.length === 0){

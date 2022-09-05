@@ -44,7 +44,6 @@ router.post('/book/info', async (req, res, next) => {
     }catch(err){
         console.log('4-1-1. 책 상세정보 조회 에러');
         console.log(err);
-        conn.release();
         res.status(404).send({success: false, err: err});
     }
 });

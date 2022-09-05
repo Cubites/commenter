@@ -15,24 +15,28 @@ const Bookblock = styled.img`
 const List = ({SearchText}) => {
   const [Books, setBooks] = useState([]);
   useEffect(() => {
-    if(SearchText !== ""){
-      axios.get(`/search/book?name=${SearchText}`)
-        .then(res => {
-          let booksCopy = [];
-          let booksData = res.data.data;
-          setBooks(...booksCopy, booksData);
-          console.log(res.data.data);
-        })
-        .catch(err => console.log("err : " + err));
-    }
-  }, [SearchText]);
-  if(Books !== {}){
-    console.log();  
+    axios.post('/book/seach', {
+      search: "",
+      sort: 0,
+      item_size: 10,
+      page_num: 1
+    })
+      .then(res => {
+        console.log(res);
+        let booksCopy = [];
+        let booksData = res.data.data;
+        setBooks(...booksCopy, booksData);
+        console.log(res.data.data);
+      })
+      .catch(err => console.log("err : " + err));
+    }, [SearchText]);
+  if(Books.length !== 0){
+    console.log(Books);  
   }
   return (
     <Container>
       {
-        Books === {} ? "" : Books.map((data, i) => <Bookblock key={"book_" + i} src={data.image}/>)
+        Books === {} ? "" : Books.map((data, i) => <Bookblock key={"book_" + i} src={data.image_url}/>)
       }
     </Container>
   )

@@ -24,22 +24,26 @@ const commentDelete = require('./routers/commentDelete');
 const userLogin = require('./routers/userLogin');
 const userInfo = require('./routers/userInfo');
 const userUpdate = require('./routers/userUpdate');
-
+const qnaInsert = require('./routers/qnaInsert');
 const qnaSearch = require('./routers/qnaSearch');
 const qnaInfo = require('./routers/qnaInfo');
 
 // 0. 로그인 토큰 유효성 검사
 app.use(poolTokenAuth);
 
-app.use('/test', (req, res) => {
-    res.status(200).send(req.body);
-});
+// app.use('/test', (req, res) => {
+//     res.status(200).send(req.body);
+// });
 
 // ad-1. 도서 추가
 app.post('/book/add', addbook);
 
 // 1. 검색 페이지 도서 조회
-app.post('/book/search', bookSearch);
+app.post('/book/search', (req, res, next) => {
+    console.log(req.body);
+    res.status(200).send("서버 통신 성공");
+})
+// app.post('/book/search', bookSearch);
 
 // 2. 책 페이지 책 데이터 조회
 app.post('/book/info', bookInfo);
@@ -66,6 +70,7 @@ app.post('/user/info', userInfo);
 app.post('/user/update', userUpdate);
 
 // 10. 문의 전송
+app.post('/qna/insert', qnaInsert);
 
 // 11. 문의 조회
 app.post('/qna/search', qnaSearch);
