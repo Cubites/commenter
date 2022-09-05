@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 
+import List from './List';
+
+const HomePage = styled.div`
+  
+`;
+
 const Main = styled.div`
   background-image: url("/images/main.png");
   background-repeat: no-repeat;
@@ -98,21 +104,29 @@ const Home = () => {
 
   const SubmitHandler = (e) => {
     e.preventDefault();
-    axios.get(`/search/book?name=${SearchText}`)
+    axios.post('/book/search', {
+      search: SearchText,
+      sort: 0,
+      item_size: 10,
+      page_num: 1
+    })
       .then(res => console.log(res))
       .catch(err => console.log("err : " + err));
   }
 
   return (
-    <Main>
-      <Logo src="/images/logo_color.png" alt="logo"/>
-      <LoginButton onClick={MoveMainPage}>메인 페이지</LoginButton>
-      <SearchBox style={{display: "flex"}} onSubmit={SubmitHandler}>
-        <SearchIcon src="/images/search_icon.png" alt="search_icon" />
-        <SearchInput type="text" value={SearchText} onChange={textHandler} placeholder="검색어를 입력해주세요."/>
-        <SearchButton type="submit">검색</SearchButton>
-      </SearchBox>
-    </Main>
+    <HomePage>
+      <Main>  
+        <Logo src="/images/logo_color.png" alt="logo"/>
+        <LoginButton onClick={MoveMainPage}>메인 페이지</LoginButton>
+        <SearchBox style={{display: "flex"}} onSubmit={SubmitHandler}>
+          <SearchIcon src="/images/search_icon.png" alt="search_icon" />
+          <SearchInput type="text" value={SearchText} onChange={textHandler} placeholder="검색어를 입력해주세요."/>
+          <SearchButton type="submit">검색</SearchButton>
+        </SearchBox>
+      </Main>
+      <List />
+    </HomePage>
   )
 }
 
