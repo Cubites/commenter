@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
 
 const Container = styled.div`
   padding-left: 15%;
@@ -12,24 +11,7 @@ const Bookblock = styled.img`
   margin: 2%;
 `
 
-const List = ({SearchText}) => {
-  const [Books, setBooks] = useState([]);
-  useEffect(() => {
-    axios.post('/book/seach', {
-      search: "",
-      sort: 0,
-      item_size: 10,
-      page_num: 1
-    })
-      .then(res => {
-        console.log(res);
-        let booksCopy = [];
-        let booksData = res.data.data;
-        setBooks(...booksCopy, booksData);
-        console.log(res.data.data);
-      })
-      .catch(err => console.log("err : " + err));
-    }, [SearchText]);
+const List = ({SearchText, Books}) => {
   if(Books.length !== 0){
     console.log(Books);  
   }
