@@ -1,6 +1,28 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+const Header = ({UpAnimation, SubmitHandler}) => {
+  const [SearchWord, setSearchWord] = useState("");
+  const SearchWordHandler = (e) => {
+    e.preventDefault();
+    setSearchWord(e.currentTarget.value);
+  }
+  const SearchHandlerInHeader = (e) => {
+    e.preventDefault();
+    SubmitHandler(SearchWord);
+  }
+  return (
+    <Headerbar className={'mainHeader ' + (UpAnimation ? 'mainHeaderShow' : '')}>
+      <Logo src="images/logo_white.png"/>
+      <Searchbar onSubmit={SearchHandlerInHeader}>
+        <SearchInput value={SearchWord} onChange={SearchWordHandler}/>
+        <SearchButton type="submit"><SearchButtonIcon src="images/search_icon.png"/></SearchButton>
+      </Searchbar>
+      <LoginButton src="images/login_img.png"/>
+    </Headerbar>
+  )
+}
+
 const Headerbar = styled.div`
   width: 100%;
   height: 80px;
@@ -11,10 +33,18 @@ const Headerbar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  @media screen and (max-width: 900px) {
+    padding-left: 5%;
+    padding-right: 5%;
+    height: 10vw;
+  }
 `;
 const Logo = styled.img`
   display: block;
   height: 50px;
+  @media screen and (max-width: 900px) {
+    height: 4vw;
+  }
 `;
 const Searchbar = styled.form`
   width: 500px;
@@ -22,6 +52,13 @@ const Searchbar = styled.form`
   border-radius: 30px;
   overflow: hidden;
   position: relative;
+  margin-left: 30px;
+  margin-right: 30px;
+  @media screen and (max-width: 900px) {
+    height: 5vw;
+    margin-left: 50px;
+    margin-right: 50px;
+  }
 `;
 const SearchInput = styled.input`
   display: block;
@@ -39,7 +76,7 @@ const SearchInput = styled.input`
 `;
 const SearchButton = styled.button`
   width: 120px;
-  height: 60px;
+  height: 100%;
   border: none;
   border-radius: 30px;
   background-color: #fff;
@@ -48,32 +85,24 @@ const SearchButton = styled.button`
   top: 0;
   opacity: 0.8;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+  @media screen and (max-width: 900px) {
+    width: 15vw;
+  }
+`;
+const SearchButtonIcon = styled.img`
+  @media screen and (max-width: 900px) {
+    width: 4vw;
+  }
 `;
 const LoginButton = styled.img`
   cursor: pointer;
+  @media screen and (max-width: 900px) {
+    height: 5vw;
+  }
 `;
-
-const Header = ({setSearchText}) => {
-  const [SearchWord, setSearchWord] = useState("");
-  const SearchWordHandler = (e) => {
-    e.preventDefault();
-    setSearchWord(e.currentTarget.value);
-  }
-  const SubmitHandler = (e) => {
-    e.preventDefault();
-    setSearchText(SearchWord);
-  }
-  return (
-    <Headerbar>
-      <Logo src="images/logo_white.png"/>
-      <Searchbar onSubmit={SubmitHandler}>
-        <SearchInput value={SearchWord} onChange={SearchWordHandler}/>
-        <SearchButton type="submit"><img src="images/search_icon.png"/></SearchButton>
-      </Searchbar>
-      <LoginButton src="images/login_img.png"/>
-    </Headerbar>
-  )
-}
 
 export default Header

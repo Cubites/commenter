@@ -5,16 +5,14 @@ const Container = styled.div`
   padding-left: 15%;
   padding-right: 15%;
   height: 500px;
+  text-align: center;
 `
 const Bookblock = styled.img`
-  width: 15%;
+  width: 200px;
   margin: 2%;
 `
 
-const List = ({SearchText, Books}) => {
-  if(Books.length !== 0){
-    console.log(Books);  
-  }
+const List = ({Books}) => {
   return (
     <Container>
       {
