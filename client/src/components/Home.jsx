@@ -61,10 +61,11 @@ const Home = ({UpAnimation, setUpAnimation}) => {
           <DownBtn onClick={() => setUpAnimation(true)}><DownBtnIcon src="/images/down_btn.png"/></DownBtn>
         </Main>
         <Header UpAnimation={UpAnimation} />
-        <Routes>
+        <List Books={Books} />
+        {/* <Routes>
           <Route index path="search" element={<List Books={Books} />} />
           <Route path="login" element={<div></div>} />
-        </Routes>
+        </Routes> */}
       </HomePage>
     </>
   )
