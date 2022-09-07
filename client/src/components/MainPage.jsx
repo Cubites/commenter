@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from './Header';
 import List from './List';
 
-const MainPage = () => {
+const MainPage = ({ HeaderShow, setHeaderShow}) => {
   const [SearchText, setSearchText] = useState("");
 
   return (
