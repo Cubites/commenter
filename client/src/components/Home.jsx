@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
+import dotenv from 'dotenv';
 
 import List from './List';
 import Header from './Header';
 
 const Home = ({UpAnimation, setUpAnimation}) => {
+  dotenv.config();
   const [SearchText, setSearchText] = useState("");
   const [InputText, setInputText] = useState("")
   const [Books, setBooks] = useState([]);
   const navigate = useNavigate();
+  const url = process.env.NODE_ENV === 'production' ? process.env.IP_ADDRESS : process.env.LOCALHOST_ADDRESS
 
   const MoveMainPage = (e) => {
     e.preventDefault();
@@ -24,7 +27,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
 
   const SubmitHandler = (e) => {
     e.preventDefault();
-    axios.post('/book/search', {
+    axios.post(`${url}/book/search`, {
       search: SearchText,
       sort: 0,
       item_size: 10,
@@ -35,7 +38,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   }
 
   useEffect(() => {
-    axios.post('/book/search', {
+    axios.post(`${url}/book/search`, {
       search: SearchText,
       sort: 0,
       item_size: 10,
