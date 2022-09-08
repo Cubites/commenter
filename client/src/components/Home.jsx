@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
-import dotenv from 'dotenv';
 
 import List from './List';
 import Header from './Header';
 
 const Home = ({UpAnimation, setUpAnimation}) => {
-  dotenv.config();
   const [SearchText, setSearchText] = useState("");
   const [InputText, setInputText] = useState("")
   const [Books, setBooks] = useState([]);
