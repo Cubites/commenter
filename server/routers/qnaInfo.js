@@ -9,14 +9,21 @@ router.post('/qna/info', async (req, res, next) => {
     }
     try{
         const conn = await ConnectionPool.getConnection();
-        const qnaDetailData = await conn.query(`
-            SELECT qna_date, qna_reason, qna_content, answer FROM qna WHERE qna_id = '${req.body.qna_id}' AND user_id = '${req.body.user_id}';
-        `);
-        res.status(200).send(qnaDetailData);
+        try{
+            const qnaDetailData = await conn.query(`
+                SELECT qna_date, qna_reason, qna_content, answer FROM qna WHERE qna_id = '${req.body.qna_id}' AND user_id = '${req.body.user_id}';
+            `);
+            conn.release();
+            res.status(200).send(qnaDetailData);            
+        }catch(err){
+            conn.release();
+            console.log('12-1-2. 문의 상세내용 조회 중 에러 발생');
+            res.status(404).send({success: false, reason: err});
+        }
     }catch(err){
-        console.log('12-1-2. 문의 상세내용 조회 중 에러 발생');
+        console.log('12-1-2. 문의 상세내용 조회 중 DB 에러');
         console.log(err);
-        res.status(404).send({success: false, reason: err});
+        res.status(500).send({success: false, reason: err});
     }
 });
 

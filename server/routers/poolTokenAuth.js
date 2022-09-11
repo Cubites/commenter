@@ -44,6 +44,7 @@ router.all('*', (req, res, next) => {
         req.body.needToClearCookie = false; // 쿠키가 없으므로 삭제할 필요가 없음
         req.body.needToClearRefreshToken = false; // 쿠키가 없으므로 로그인 상태가 아님. 따라서 RefreshToken을 지울 필요가 없음
         req.body.isLogout = false; // 쿠키가 없으므로 로그인 상태가 아님. 따라서 로그아웃을 할 필요가 없음
+        req.body.user_id = null;
         next();
     }
 });
@@ -215,18 +216,26 @@ router.all('*', async (req, res, next) => {
         console.log('0-5-1. Refresh Token 삭제 필요');
         try{
             const conn = await ConnectionPool.getConnection();
-            if(req.signedCookies.auth !== undefined){ // 쿠키가 있는 경우
-                if(req.signedCookies.auth.user_id !== undefined){ // user_id가 있는 경우 user_id로 Refresh Token 삭제
-                    await conn.query(`DELETE FROM login_token WHERE user_id = '${req.signedCookies.auth.user_id}';`);
+            try{
+                if(req.signedCookies.auth !== undefined){ // 쿠키가 있는 경우
+                    if(req.signedCookies.auth.user_id !== undefined){ // user_id가 있는 경우 user_id로 Refresh Token 삭제
+                        await conn.query(`DELETE FROM login_token WHERE user_id = '${req.signedCookies.auth.user_id}';`);
+                    }
+                    if(req.signedCookies.auth.access_token !== undefined){ // access_token이 있는 경우 access_token으로 Refresh Token 삭제
+                        await conn.query(`DELETE FROM login_token WHERE access_token = '${req.signedCookies.auth.access_token}';`);
+                    }
                 }
-                if(req.signedCookies.auth.access_token !== undefined){ // access_token이 있는 경우 access_token으로 Refresh Token 삭제
-                    await conn.query(`DELETE FROM login_token WHERE access_token = '${req.signedCookies.auth.access_token}';`);
-                }
+                console.log('0-5-2. Refresh Token이 정상적으로 삭제됨');
+                conn.release();                
+                next();
+            }catch(err){
+                conn.release();
+                console.log('0-5-2. Refresh Token 삭제 중 에러 발생');
+                console.log(err);
+                next();
             }
-            console.log('0-5-2. Refresh Token이 정상적으로 삭제됨');
-            next();
         }catch(err){
-            console.log('0-5-2. Refresh Token 삭제 중 에러');
+            console.log('0-5-2. Refresh Token 삭제 중 DB 에러');
             console.log(err);
             next();
         }
