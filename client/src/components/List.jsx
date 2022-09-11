@@ -26,7 +26,7 @@ const List = ({SearchText}) => {
   return (
     <Container>
       {
-        Books === {} ? "" : Books.map((data, i) => <Bookblock key={"book_" + i} src={data.image} href = "/book/1"/>)
+        Books === {} ? "" : Books.map((data, i) => <Bookblock key={"book_" + i} src={data.image} href = "/book?oid={data.isbn}"/>)
       }
     </Container>
   )

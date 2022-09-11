@@ -79,7 +79,7 @@ app.post('/book/info', (req, res) => {
     console.log(req.body.id);
 
     let data = {
-        id : '1',
+        isbn : '1',
         book_name : '테스트 북',
         writer : 'commenter',
         like_num : 9,
@@ -98,7 +98,7 @@ app.post('/comment/info', (req, res) => {
     console.log(req.body.sort);
 
     let data = {
-        book_id : '1',
+        isbn : '1',
         date : '2021-05-04',
         content : '기말 A+',
         nickname : '대학웑죽어',
