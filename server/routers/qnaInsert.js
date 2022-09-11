@@ -17,14 +17,14 @@ router.post('/qna/insert', async (req, res, next) => {
             `);
             res.status(200).send({success: true, reason: null});
         }catch(err){
-            console.log('10-1-1. 문의 내용 업로드 중 에러');
+            console.log('10-1-1. 문의 내용 업로드 중 에러 발생');
             console.log(err);
-            res.status(404).send({success: false, reason: '문의 내용 업로드 에러'});
+            res.status(404).send({success: false, reason: err});
         }        
     }catch(err){
         console.log('10-1-1. 문의 접수 중 DB 연결 에러');
         console.log(err);
-        res.status(404).send({success: false, reason: 'DB 연결 에러'})
+        res.status(500).send({success: false, reason: 'err'});
     }
 });
 

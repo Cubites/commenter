@@ -10,14 +10,20 @@ router.post('/qna/search', async (req, res, next) => {
     }
     try{
         const conn = await ConnectionPool.getConnection();
-        const qnaData = await conn.query(`
-            SELECT qna_id, qna_reason, qna_content, qna_date, answer FROM qna WHERE user_id = '${req.body.user_id}';
-        `);
-        console.log(qnaData);
-        res.status(200).send(qnaData);
+        try{
+            const qnaData = await conn.query(`
+                SELECT qna_id, qna_reason, qna_content, qna_date, answer FROM qna WHERE user_id = '${req.body.user_id}';
+            `);
+            conn.release();
+            res.status(200).send(qnaData);
+        }catch(err){
+            conn.release();
+            console.log('11-1-1. QnA 데이터 요청 중 에러 발생');
+            res.status(404).send({success: false, reason: err});
+        }
     }catch(err){
         console.log('11-1-1. QnA 데이터 요청 중 에러 발생');
-        console.log(err);
+        res.status(500).send({success: false, reason: err});
     }
 });
 
