@@ -35,7 +35,7 @@ router.post('/comment/delete', async (req, res, next) => {
             res.status(404).send({success: false, reason: '코멘트 삭제중 에러 발생'});
         }
     }catch(err){
-        console.log('6-1-1. 코멘트 삭제 DB 연결 에러');
+        console.log('6-1-1. DB 연결 에러');
         console.log(err);
         res.status(404).send({success: false, reason: err});
     }

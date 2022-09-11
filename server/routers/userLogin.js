@@ -35,14 +35,15 @@ router.post('/user/login', async (req, res, next) => {
                 req.body.user_id = 0;
                 req.body.isNewBie = true;
             }
+            conn.release();
             next();
         }catch(err){
+            conn.release();
             console.log('1-1-1. 유저 정보 조회 에러');
             console.log(err);
             res.clearCookie('auth');
             res.status(404).send({user_id: null, login_success: false, isLogout: true});
         }
-        conn.release();
     }catch(err){
         console.log('1-1-1. DB 연결 에러');
         console.log(err);
@@ -65,23 +66,20 @@ router.post('/user/login', async (req, res, next) => {
                 const userCount = await conn.query(`SELECT user_id AS last_ui FROM user_info ORDER BY user_id DESC LIMIT 1;`);
                 let newUserId = `UI${('0000000000' + (Number((userCount[0].last_ui).slice(-10)) + 1)).slice(-10)}`;
                 console.log('1-2-3. 신규 유저 아이디 생성 완료 : ', newUserId);
-                try{
-                    await conn.query(`
-                        INSERT user_info (user_id, nickname, ${req.body.login_method}_token)
-                        VALUES ('${newUserId}', '${'NK' + newUserId.slice(-10)}', '${req.body.user_code}');`);
-                    console.log('1-2-4. 신규 유저 정보 저장 완료');
-                    req.body.user_id = newUserId;
-                    next();
-                }catch(err){
-                    console.log('1-2-4. 신규 유저 정보 저장 중 에러 발생. 회원가입 중지');
-                    res.status(404).send({user_id: null, isLogout: true});
-                }
+
+                await conn.query(`
+                    INSERT user_info (user_id, nickname, ${req.body.login_method}_token)
+                    VALUES ('${newUserId}', '${'NK' + newUserId.slice(-10)}', '${req.body.user_code}');`);
+                console.log('1-2-4. 신규 유저 정보 저장 완료');
+                req.body.user_id = newUserId;
+                conn.release();
+                next();
             }catch(err){
-                console.log('1-2-3. 신규 유저 아이디 생성 중 에러 발생. 회원가입 중지');
+                conn.release();
+                console.log('1-2-5. 신규 유저 아이디 생성 및 저장 중 에러 발생. 회원가입 중지');
                 console.log(err);
                 res.status(404).send({user_id: null, isLogout: true});
             }
-            conn.release();
         }catch(err){
             console.log('1-2-3. DB 연결 에러');
             console.log(err);
@@ -96,7 +94,6 @@ router.post('/user/login', async (req, res, next) => {
 // 3. Access Token, Refresh Token 발급
 router.post('/user/login', async (req, res, next) => {
     console.log('1-3. 토큰 발급');
-    console.log('req.body.user_id : ', req.body.user_id);
     if(req.body.user_id !== null){
         console.log('1-3-1. 유저 조회에 성공(user_id가 있음). 토큰 발급');
         let access_token = accessToken(req.body.user_id, process.env.JWT_SECRET_KEY);
@@ -117,16 +114,16 @@ router.post('/user/login', async (req, res, next) => {
                     [req.body.user_id, access_token, refresh_token.refressToken, refresh_token.expire]);
                 console.log('1-3-4. 토큰 저장 성공');
                 req.body.access_token = access_token;
-                console.log('Access Token 최종 확인 : ' + req.body.access_token);
+                conn.release();
                 res.clearCookie('auth');
                 res.cookie('auth', {user_id: req.body.user_id, access_token: req.body.access_token}, {httpOnly: true, signed: true})
                     .status(200).send({loginSuccess: true, isLogout: req.body.isLogout});
             }catch(err){
+                conn.release();
                 console.log('1-3-2. 토큰 저장 실패, 재 로그인 권장');
                 console.log(err);
                 res.status(404).send({success: false, reason: '로그인 토큰 저장 실패'});
             }
-            conn.release();
         }catch(err){
             console.log('1-3-2. DB 연결 에러');
             console.log(err);

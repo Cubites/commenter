@@ -31,10 +31,6 @@ const qnaInfo = require('./routers/qnaInfo');
 // 0. 로그인 토큰 유효성 검사
 app.use(poolTokenAuth);
 
-// app.use('/test', (req, res) => {
-//     res.status(200).send(req.body);
-// });
-
 // ad-1. 도서 추가
 app.post('/book/add', addbook);
 

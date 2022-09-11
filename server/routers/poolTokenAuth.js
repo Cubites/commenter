@@ -107,53 +107,63 @@ router.all('*', async (req, res, next) => { // Access Token이 만료된 경우 
         console.log('0-3-1. Access Token 만료됨. Refresh Token 조회');
         try{
             const conn = await ConnectionPool.getConnection();
-            const data = await conn.query(`SELECT * FROM login_token WHERE user_id = '${req.signedCookies.auth.user_id}';`);
-            console.log('0-3-2. DB에서 Access Token 조회 결과 : ', data[0]);
-            if(data.length === 0){
-                console.log('0-3-3. Access Token에 맞는 Refresh Token이 없음. 로그아웃 처리');
-                req.body.needToClearCookie = true; // refresh Token이 없어 유효성 확인 불가. 불필요한 쿠키이므로 삭제 처리
-                req.body.needToClearRefreshToken = false; // Access Token에 해당하는 Refresh Token가 없으므로 삭제할 필요가 없음
-                req.body.isLogout = true; // Access Token이 유효하지 않으므로 로그아웃 처리
-                next();
-            }else{
-                console.log('0-3-3. Access Token에 맞는 Refresh Token이 있음');
-                if(data[0].access_token !== req.signedCookies.auth.access_token){ // 쿠키의 user_id와 DB의 user_id가 일치하지 않음
-                    console.log('0-3-4. User Id 와 Access Token이 일치하지 않음.');
-                    req.body.needToClearCookie = true; // 부정한 접근이므로 해당 쿠키 삭제
-                    req.body.needToClearRefreshToken = true; // 부정한 접근이므로 보안을 위해 RefreshToken 삭제
-                    req.body.isLogout = true; // 부정한 접근이므로 로그아웃 처리
+            try{
+                const data = await conn.query(`SELECT * FROM login_token WHERE user_id = '${req.signedCookies.auth.user_id}';`);
+                console.log('0-3-2. DB에서 Access Token 조회 결과 : ', data[0]);
+                if(data.length === 0){
+                    console.log('0-3-3. Access Token에 맞는 Refresh Token이 없음. 로그아웃 처리');
+                    req.body.needToClearCookie = true; // refresh Token이 없어 유효성 확인 불가. 불필요한 쿠키이므로 삭제 처리
+                    req.body.needToClearRefreshToken = false; // Access Token에 해당하는 Refresh Token가 없으므로 삭제할 필요가 없음
+                    req.body.isLogout = true; // Access Token이 유효하지 않으므로 로그아웃 처리
                     next();
                 }else{
-                    console.log('0-3-4. Refresh Token 확인. Refresh Token 유효성 검사 시행');
-                    jwt.verify(data[0].refresh_token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-                        if(err){
-                            console.log('0-3-5. Refresh Token 유효성 검사 중 에러 발생');
-                            req.body.needToClearCookie = true; // 보안을 위해 쿠키 삭제
-                            req.body.needToClearRefreshToken = true; // 보안을 위해 Refresh Token 삭제
-                            req.body.isLogout = true; // 보안을 위해 로그아웃 처리
-                            console.log(err);
-                            next();
-                        }else{
-                            console.log('0-3-5. Refresh Token 조회 성공. Access Token 발급 이력 확인됨');
-                            if(decoded.expire > Date.now()){ // Refresh Token이 유효한 경우
-                                console.log('0-3-6. Refresh Token 유효. Access Token 재발급 시행');
-                                req.body.access_token = accessToken(decoded.userId, process.env.JWT_SECRET_KEY);
-                                req.body.needToUpdateAccessToken = true; // 재발급한 Access token을 DB에 업로드 필요
+                    console.log('0-3-3. Access Token에 맞는 Refresh Token이 있음');
+                    if(data[0].access_token !== req.signedCookies.auth.access_token){ // 쿠키의 user_id와 DB의 user_id가 일치하지 않음
+                        console.log('0-3-4. User Id 와 Access Token이 일치하지 않음.');
+                        req.body.needToClearCookie = true; // 부정한 접근이므로 해당 쿠키 삭제
+                        req.body.needToClearRefreshToken = true; // 부정한 접근이므로 보안을 위해 RefreshToken 삭제
+                        req.body.isLogout = true; // 부정한 접근이므로 로그아웃 처리
+                        next();
+                    }else{
+                        console.log('0-3-4. Refresh Token 확인. Refresh Token 유효성 검사 시행');
+                        jwt.verify(data[0].refresh_token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+                            if(err){
+                                console.log('0-3-5. Refresh Token 유효성 검사 중 에러 발생');
+                                req.body.needToClearCookie = true; // 보안을 위해 쿠키 삭제
+                                req.body.needToClearRefreshToken = true; // 보안을 위해 Refresh Token 삭제
+                                req.body.isLogout = true; // 보안을 위해 로그아웃 처리
+                                console.log(err);
                                 next();
                             }else{
-                                console.log('0-3-6. Refresh Token 만료. 로그아웃 처리.');
-                                req.body.needToClearCookie = true; // 로그아웃 처리와 같이 쿠키 삭제
-                                req.body.needToClearRefreshToken = true; // Refresh Token이 만료되었으므로 삭제 필요
-                                req.body.isLogout = true; // 로그아웃 처리
-                                next();
-                            }
-                        } 
-                    });
+                                console.log('0-3-5. Refresh Token 조회 성공. Access Token 발급 이력 확인됨');
+                                if(decoded.expire > Date.now()){ // Refresh Token이 유효한 경우
+                                    console.log('0-3-6. Refresh Token 유효. Access Token 재발급 시행');
+                                    req.body.access_token = accessToken(decoded.userId, process.env.JWT_SECRET_KEY);
+                                    req.body.needToUpdateAccessToken = true; // 재발급한 Access token을 DB에 업로드 필요
+                                    next();
+                                }else{
+                                    console.log('0-3-6. Refresh Token 만료. 로그아웃 처리.');
+                                    req.body.needToClearCookie = true; // 로그아웃 처리와 같이 쿠키 삭제
+                                    req.body.needToClearRefreshToken = true; // Refresh Token이 만료되었으므로 삭제 필요
+                                    req.body.isLogout = true; // 로그아웃 처리
+                                    next();
+                                }
+                            } 
+                        });
+                    }
                 }
+                conn.release();
+            }catch(err){
+                conn.release();
+                console.log('0-3-2. Refresh Token 체크 에러. 로그아웃 처리');
+                console.log(err);
+                req.body.needToClearCookie = true; // 보안을 위해 쿠키 삭제
+                req.body.needToClearRefreshToken = true; // 보안을 위해 RefreshToken 삭제
+                req.body.isLogout = true; // 보안을 위해 로그아웃 처리
+                next();
             }
-            conn.release();
         }catch(err){
-            console.log('0-3-2. Refresh Token 체크 에러. 로그아웃 처리');
+            console.log('0-3-2. DB 연결 에러. 로그아웃 처리');
             console.log(err);
             req.body.needToClearCookie = true; // 보안을 위해 쿠키 삭제
             req.body.needToClearRefreshToken = true; // 보안을 위해 RefreshToken 삭제
@@ -184,8 +194,10 @@ router.all('*', async (req, res, next) => {
                 console.log('0-4-2. 재발급된 Access Token, DB에 업로드 성공');
                 req.body.signInSkip = true; // Access Token을 재발급 받아 로그인 상태가 유지되었으므로 로그인 절차 생략
                 res.cookie('auth', {user_id: req.signedCookies.auth.user_id, access_token: req.body.access_token}, {httpOnly: true, signed: true});
+                conn.release();
                 next();
             }catch(err){
+                conn.release();
                 console.log('0-4-2. 재발급된 Access Token, DB에 업로드 실패');
                 req.body.needToClearCookie = true; // 안전을 위해 쿠키 삭제
                 req.body.needToClearRefreshToken = true; // 안전을 위해 Refresh Token 삭제
@@ -193,7 +205,6 @@ router.all('*', async (req, res, next) => {
                 console.log(err);
                 next();
             }
-            conn.release();
         }catch(err){
             console.log('0-4-2. DB 연결 에러');
             console.log(err);
@@ -235,7 +246,7 @@ router.all('*', async (req, res, next) => {
                 next();
             }
         }catch(err){
-            console.log('0-5-2. Refresh Token 삭제 중 DB 에러');
+            console.log('0-5-2. DB 연결 에러');
             console.log(err);
             next();
         }

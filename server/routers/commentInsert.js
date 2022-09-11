@@ -50,7 +50,7 @@ router.post('/comment/insert', async (req, res, next) => {
             res.status(404).send({success: false, reason: err});
         }
     }catch(err){
-        console.log('3-1-2. 코멘트 추가 DB 연결 에러');
+        console.log('3-1-2. DB 연결 에러');
         console.log(err);
         res.status(500).send({success: false, reason: err});
     }
