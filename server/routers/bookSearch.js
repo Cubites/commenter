@@ -40,7 +40,7 @@ router.post('/book/search', async (req, res, next) => {
             res.status(404).send({success: false, err: err});
         }
     }catch(err){
-        console.log('2-1-2. 책 검색 DB 연결 에러');
+        console.log('2-1-2. DB 연결 에러');
         console.log(err);
         res.status(404).send({success: false, err: err});
     }

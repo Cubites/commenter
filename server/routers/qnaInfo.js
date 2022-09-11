@@ -21,7 +21,7 @@ router.post('/qna/info', async (req, res, next) => {
             res.status(404).send({success: false, reason: err});
         }
     }catch(err){
-        console.log('12-1-2. 문의 상세내용 조회 중 DB 에러');
+        console.log('12-1-2. DB 연결 에러');
         console.log(err);
         res.status(500).send({success: false, reason: err});
     }

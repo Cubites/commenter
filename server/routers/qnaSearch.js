@@ -22,7 +22,7 @@ router.post('/qna/search', async (req, res, next) => {
             res.status(404).send({success: false, reason: err});
         }
     }catch(err){
-        console.log('11-1-1. QnA 데이터 요청 중 에러 발생');
+        console.log('11-1-1. DB 연결 에러');
         res.status(500).send({success: false, reason: err});
     }
 });

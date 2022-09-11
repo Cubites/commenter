@@ -25,7 +25,7 @@ router.post('/comment/report', async (req, res, next) => {
                 res.status(404).send({success: false, reason: err});
             }
         }catch(err){
-            console.log('5-1-1. 코멘트 신고 DB 연결 에러');
+            console.log('5-1-1. DB 연결 에러');
             res.status(500).send({success: false, reason: err});
         }
     }

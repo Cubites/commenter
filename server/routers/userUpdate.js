@@ -10,12 +10,22 @@ router.post('/user/update', async (req, res, next) => {
     }else{
         try{
             const conn = await ConnectionPool.getConnection();
-            await conn.query(`UPDATE user_info SET nickname = '${req.body.user_nick}', intro = '${req.body.user_profile}' WHERE user_id = '${req.body.user_id}'`);
-            res.status(200).send({success: true, reason: null});
+            try{
+                await conn.query(`
+                    UPDATE user_info SET nickname = '${req.body.user_nick}', intro = '${req.body.user_profile}' WHERE user_id = '${req.body.user_id}'
+                `);
+                conn.release();
+                res.status(200).send({success: true, reason: null});
+            }catch(err){
+                conn.release();
+                console.log('9-1-1. 유저정보 수정 중 에러 발생');
+                console.log(err);
+                res.status(404).send({success: false, reason: err});
+            }
         }catch(err){
-            console.log('9-1-1. 유저정보 수정 중 에러 발생');
+            console.log('9-1-1. DB 연결 에러');
             console.log(err);
-            res.status(404).send({success: false, reason: '수정 실패'});
+            res.status(404).send({success: false, reason: err});
         }
     }
 });

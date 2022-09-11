@@ -15,14 +15,16 @@ router.post('/qna/insert', async (req, res, next) => {
                 insert qna (qna_id, user_id, qna_reason, qna_content, qna_date) 
                 values ('QN${('0000000000' + (Number(qnaLatestId[0].qna_id.slice(-10))+1)).slice(-10)}', '${req.body.user_id}', '${req.body.qna_reason}', '${req.body.qna_content}', DATE_FORMAT('${nowTime()}', '%Y-%m-%d %H:%i:%s'));
             `);
+            conn.release();
             res.status(200).send({success: true, reason: null});
         }catch(err){
+            conn.release();
             console.log('10-1-1. 문의 내용 업로드 중 에러 발생');
             console.log(err);
             res.status(404).send({success: false, reason: err});
         }        
     }catch(err){
-        console.log('10-1-1. 문의 접수 중 DB 연결 에러');
+        console.log('10-1-1. DB 연결 에러');
         console.log(err);
         res.status(500).send({success: false, reason: 'err'});
     }
