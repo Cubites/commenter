@@ -49,7 +49,7 @@ router.post('/comment/info', async (req, res, next) => {
                     ) AS is_reported
                 FROM comment cm
                 WHERE isbn = '${req.body.isbn}'
-                ORDER BY ${req.body.sort === 0 ? `cm.comment_date` : `comment_like_num`} DESC
+                ORDER BY ${req.body.sort === 0 ? `cm.comment_date` : `cm_like_num`} DESC
                 LIMIT ${Number(req.body.item_size) * (Number(req.body.page_num) - 1)}, ${Number(req.body.item_size)};
             `);
             res.status(200).send(commentData);

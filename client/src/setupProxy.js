@@ -14,4 +14,12 @@ module.exports = function(app){
             changeOrigin: true
         })
     );
+
+    app.use(
+        '/comment',
+        createProxyMiddleware({
+            target: 'http://localhost:4000',
+            changeOrigin: true
+        })
+    );
 };

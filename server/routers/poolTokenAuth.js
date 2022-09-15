@@ -44,6 +44,7 @@ router.all('*', (req, res, next) => {
         req.body.needToClearCookie = false; // 쿠키가 없으므로 삭제할 필요가 없음
         req.body.needToClearRefreshToken = false; // 쿠키가 없으므로 로그인 상태가 아님. 따라서 RefreshToken을 지울 필요가 없음
         req.body.isLogout = false; // 쿠키가 없으므로 로그인 상태가 아님. 따라서 로그아웃을 할 필요가 없음
+        req.body.user_id = null;
         next();
     }
 });

@@ -167,7 +167,8 @@ const Home = ({ IsLogin }) => {
 
   const SubmitHandler = (e) => {
     e.preventDefault();
-    axios.get(`/book/search?name=${SearchText}`)
+    
+    axios.get(`/book/search?search=${SearchText}`)
       .then(res => console.log(res))
       .catch(err => console.log("err : " + err));
   }

@@ -2,20 +2,41 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
-const Headerbar = styled.div`
+
+const HeaderbarLine = styled.div`
   width: 100%;
-  height: 80px;
+  height: 64px;
   background-color: #44B606;
+`
+
+const Headerbar = styled.div`
+  width: 1152px;
+  height: 64px;  
+  margin:auto;
   box-sizing: border-box;
-  padding-left: 15%;
-  padding-right: 15%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  @media screen and (max-width : 1152px){
+    width:100%;
+    margin:0px;    
+    min-width: 500px;
+  }
 `;
-const Logo = styled.img`
+const Logo = styled.div`
   display: block;
+  background-image: url("/images/logo_white.png");
+  background-size: cover; 
+  background-position: center;
+  background-color: transparent;
+  width: 200px;
   height: 50px;
+  margin-left: 16px;
+  margin-right: 16px;
+  @media screen and (max-width : 1152px){
+    background-image: url("/images/logo_white_mini.png");
+    max-width: 50px;
+  }
 `;
 const Searchbar = styled.form`
   width: 500px;
@@ -52,7 +73,9 @@ const SearchButton = styled.button`
   cursor: pointer;
 `;
 const LoginButton = styled.img`
-  cursor: pointer;
+  cursor: pointer;  
+  margin-left: 16px;
+  margin-right: 16px;
 `;
 const LoginSuccess = styled.button`
 
@@ -92,8 +115,9 @@ const Header = ({setSearchText , IsLogin, IsLoginHandler }) => {
   let user_nick = Cookies.get('user_nick');
   
   return (
+    <HeaderbarLine>
     <Headerbar>
-      <Logo src="images/logo_white.png"/>
+      <Logo/>
       <Searchbar onSubmit={SubmitHandler}>
         <SearchInput value={SearchWord} onChange={SearchWordHandler}/>
         <SearchButton type="submit"><img src="images/search_icon.png"/></SearchButton>
@@ -104,6 +128,7 @@ const Header = ({setSearchText , IsLogin, IsLoginHandler }) => {
         <LoginButton onClick={MoveLoginPage} src="images/login_img.png"/>
       }
     </Headerbar>
+    </HeaderbarLine>
   )
 }
 

@@ -14,11 +14,21 @@ const Bookblock = styled.img`
 
 const List = ({SearchText}) => {
   const [Books, setBooks] = useState([]);
+  console.log("조회 시작");
   useEffect(() => {    
     if(SearchText != ""){
-      axios.post(`/book/search`, {search: SearchText, sort: 0})
+      console.log("조회 시작");
+      axios.post(`/book/search`, 
+      {
+        search: SearchText,
+        sort: 0,
+        item_size:30,
+        page_num:1,
+        user_id:""
+      })
         .then(res => {
-          setBooks(res.data.data);
+          console.log(res.data);
+          setBooks(res.data);
         })
         .catch(err => console.log("err : " + err));
     }
@@ -26,7 +36,7 @@ const List = ({SearchText}) => {
   return (
     <Container>
       {
-        Books === {} ? "" : Books.map((data, i) => <Bookblock key={"book_" + i} src={data.image} href = "/book?oid={data.isbn}"/>)
+        Books === {} ? "" : Books.map((data, i) => <a href ={"/detail?oid=" +  data.isbn}><Bookblock key={"book_" + i} src={data.image_url}/></a>)
       }
     </Container>
   )
