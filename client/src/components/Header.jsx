@@ -92,6 +92,7 @@ const Header = ({setSearchText , IsLogin, IsLoginHandler }) => {
   }
   const SubmitHandler = (e) => {
     e.preventDefault();
+    console.log("submit"+SearchWord);
     setSearchText(SearchWord);
   }
   console.log("Token: " + Cookies.get('login_token'));

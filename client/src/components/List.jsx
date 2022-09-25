@@ -12,13 +12,13 @@ const Bookblock = styled.img`
   margin: 2%;
 `
 
-const List = ({SearchText}) => {
+const List = ({SearchText}) => {  
   const [Books, setBooks] = useState([]);
   console.log("조회 시작");
   useEffect(() => {    
     if(SearchText != ""){
-      console.log("조회 시작");
-      axios.post(`/book/search`, 
+      console.log(SearchText);
+      axios.post(`/book/search`,
       {
         search: SearchText,
         sort: 0,

@@ -1,0 +1,114 @@
+
+ #center {
+    border : 1px solid black;
+    width : 100% - 8px;
+    height : 100%;
+    display : flex;
+    padding : 8px;
+  }
+  
+  
+  
+  
+  #detail {
+    border: 1px solid blue;
+    height : 80vh;
+    flex: 30%;  
+    min-width: 200px;
+    margin: 8px;
+    text-align:center;
+  }
+  
+  #right {
+    border: 1px solid red;
+    flex: 70%;
+    margin: 8px;
+  }
+  
+  ul {
+    list-style:none;
+    padding-left:16px;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  .content{
+    display:flex;
+    flex-flow : row wrap;
+    padding : 8px;
+  }
+  
+  #titleM {
+    display:None;
+  }
+  
+  #image {
+    display: inline-block;
+    border: 1px solid green;
+    min-width : 300px;
+    height: 500px;
+  }
+  
+  #content {
+    margin:16px;
+  }
+  
+  #buttonA {
+    border: 1px solid red;
+    margin: auto;
+    height: 20%;
+  }
+  
+  #titleP {
+    width:100%;
+    margin:16px;
+    border: 1px soild sky;
+  }
+  
+  #input{
+    
+  }
+  
+  #inputArea {
+    border: 1px solid black;
+    display:inline-block;
+    width:80%
+  }
+  
+  #types {
+    border: 1px solid black;
+    height: 40px;
+    margin: 16px;
+  }
+  
+  #buttonB {
+    display:inline-block;
+    border: 1px solid black;
+    width:10%
+  }
+  
+  .list{
+    width: 100%;
+    margin:auto;
+  }
+  
+  .box{
+    width: 100% - 32;
+    height: 20vh;
+    border: 1px solid orange;
+    margin: 16px;
+  }
+  
+   @media screen and (max-width: 1100px) {
+     #center {
+        flex-direction:column;
+     }
+     #titleM {
+       display:block;
+     }
+     #titleP {
+       display:none;
+     }
+  }

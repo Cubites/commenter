@@ -15,7 +15,7 @@ const MainPage = ({ IsLogin, IsLoginHandler }) => {
     <>
       <Header setSearchText={setSearchText} IsLogin={IsLogin} IsLoginHandler={IsLoginHandler}/>
         <Routes>
-          <Route index path="search" element={<List SearchText={SearchText}/>}/>
+          <Route index path="*" element={<List SearchText={SearchText}/>}/>
           <Route path="detail" element={<Detail/>}/>
           <Route path="login" element={<Login IsLogin={IsLogin} IsLoginHandler={IsLoginHandler}/>}/>
         </Routes>
