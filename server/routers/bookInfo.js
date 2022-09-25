@@ -19,6 +19,7 @@ router.post('/book/info', async (req, res, next) => {
                     , bk.discount
                     , bk.isbn
                     , bk.sale_link
+                    , bk.publication
                     ${
                         req.body.user_id === null ?
                         `
