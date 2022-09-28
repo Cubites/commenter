@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -11,7 +11,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   const [InputText, setInputText] = useState("")
   const [Books, setBooks] = useState([]);
   const navigate = useNavigate();
-  const url = process.env.NODE_ENV === 'production' ? process.env.IP_ADDRESS : process.env.LOCALHOST_ADDRESS
+  const url = process.env.REACT_APP_NODE_ENV === 'production' ? process.env.REACT_APP_IP_ADDRESS : process.env.REACT_APP_LOCALHOST_ADDRESS
 
   const MoveMainPage = (e) => {
     e.preventDefault();
@@ -23,8 +23,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
     setInputText(e.currentTarget.value);
   }
 
-  const SubmitHandler = (e) => {
-    e.preventDefault();
+  const SubmitHandler = () => {
     axios.post(`${url}/book/search`, {
       search: SearchText,
       sort: 0,
