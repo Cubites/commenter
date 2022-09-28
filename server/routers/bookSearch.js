@@ -24,7 +24,7 @@ router.post('/book/search', async (req, res, next) => {
                     ${
                         req.body.user_id !== null ?
                         `, (SELECT is_book_favor FROM book_favor bf2 where bf2.user_id = '${req.body.user_id}' and bf2.isbn = bk.isbn) as like_set` :
-                        `null AS like_set`
+                        `, null AS like_set`
                     }
                 FROM book bk
                 WHERE book_title LIKE '%${req.body.search}%'
