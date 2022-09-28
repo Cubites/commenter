@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const app = express();
 
@@ -8,6 +9,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 dotenv.config();
 app.use(cookieParser(process.env.COOKIE_SECRET_KEY));
+app.use(cors({ origin: '*' }));
 
 app.set('port', 4000);
 
