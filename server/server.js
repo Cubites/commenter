@@ -30,6 +30,11 @@ const qnaInsert = require('./routers/qnaInsert');
 const qnaSearch = require('./routers/qnaSearch');
 const qnaInfo = require('./routers/qnaInfo');
 
+// test
+app.all('/test', (req, res) => {
+    res.status(200).send({connection: true});
+});
+
 // 0. 로그인 토큰 유효성 검사
 app.use(poolTokenAuth);
 
