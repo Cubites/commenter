@@ -2,15 +2,6 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const fs = require('fs');
-const https = require('https');
-
-let https_options = {
-    ca: fs.readFileSync("/etc/letsencrypt/live/commenter.link/chain.pem"),
-    key: fs.readFileSync("/etc/letsencrypt/live/commenter.link/privkey.pem"),
-    cert: fs.readFileSync("/etc/letsencrypt/live/commenter.link/cert.pem")
-};
-console.log(https_options);
 
 const app = express();
 
@@ -18,7 +9,16 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 dotenv.config();
 app.use(cookieParser(process.env.COOKIE_SECRET_KEY));
-app.use(cors({ origin: '*' }));
+
+let corsOptions = {
+    origin: [
+        'http://54.180.18.215',
+        'http://commenter.link',
+        'https://54.180.18.215',
+        'https://commenter.link'
+    ]
+};
+app.use(cors(corsOptions));
 
 app.set('port', 4000);
 
@@ -87,10 +87,6 @@ app.post('/qna/search', qnaSearch);
 // 12. 문의 상세 조회
 app.post('/qna/info', qnaInfo);
 
-// app.listen(app.get('port'), () => {
-//     console.log(`app listening on port ${app.get('port')}...`);
-// });
-
-https.createServer(https_options, app).listen(app.get('port'), () => {
-    console.log('https에서 서버가 실행되었습니다.');
+app.listen(app.get('port'), () => {
+    console.log(`app listening on port ${app.get('port')}...`);
 });
