@@ -11,7 +11,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   const [InputText, setInputText] = useState("")
   const [Books, setBooks] = useState([]);
   const navigate = useNavigate();
-  const url = process.env.REACT_APP_NODE_ENV === 'production' ? `https://${process.env.REACT_APP_AWS_IP}:4000` : ''
+  const url = process.env.REACT_APP_NODE_ENV === 'production' ? `http://${process.env.REACT_APP_AWS_IP}:4000/book/search` : ''
 
   const MoveMainPage = (e) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   }
 
   const SubmitHandler = () => {
-    axios.post(`${url}/book/search`, {
+    axios.post(url, {
       search: SearchText,
       sort: 0,
       item_size: 10,
@@ -35,7 +35,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   }
 
   useEffect(() => {
-    axios.post(`${url}/book/search`, {
+    axios.post(url, {
       search: SearchText,
       sort: 0,
       item_size: 10,
