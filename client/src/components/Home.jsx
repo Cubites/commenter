@@ -12,6 +12,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   const [Books, setBooks] = useState([]);
   const navigate = useNavigate();
   const url = process.env.REACT_APP_NODE_ENV === 'production' ? `http://${process.env.REACT_APP_AWS_IP}:4000/book/search` : ''
+  console.log(url);
 
   const MoveMainPage = (e) => {
     e.preventDefault();
