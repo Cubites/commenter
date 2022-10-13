@@ -11,7 +11,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   const [InputText, setInputText] = useState("")
   const [Books, setBooks] = useState([]);
   const navigate = useNavigate();
-  const url = process.env.REACT_APP_NODE_ENV === 'production' ? `https://${process.env.REACT_APP_DNS_NAME}:4000/book/search` : '/book/search';
+  const url = process.env.REACT_APP_NODE_ENV === 'production' ? `http://${process.env.REACT_APP_DNS_NAME}:4000/book/search` : '/book/search';
   console.log(url);
 
   const MoveMainPage = (e) => {
