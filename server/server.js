@@ -18,7 +18,7 @@ let corsOptions = {
         'https://commenter.link'
     ]
 };
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 app.set('port', 4000);
 
