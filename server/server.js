@@ -51,7 +51,7 @@ app.use(poolTokenAuth);
 app.post('/book/add', addbook);
 
 // 1. 검색 페이지 도서 조회
-app.post('/book/search', bookSearch)
+app.post('/book/search', cors(corsOptions), bookSearch)
 // app.post('/book/search', bookSearch);
 
 // 2. 책 페이지 책 데이터 조회
