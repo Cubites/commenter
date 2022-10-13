@@ -40,7 +40,7 @@ const qnaSearch = require('./routers/qnaSearch');
 const qnaInfo = require('./routers/qnaInfo');
 
 // test
-app.all('/test', (req, res) => {
+app.all('/test', cors(corsOptions), (req, res) => {
     res.status(200).send({connection: true});
 });
 
