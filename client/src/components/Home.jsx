@@ -11,7 +11,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   const [InputText, setInputText] = useState("")
   const [Books, setBooks] = useState([]);
   const navigate = useNavigate();
-  const url = process.env.REACT_APP_NODE_ENV === 'production' ? `http://${process.env.REACT_APP_DNS_NAME}:4000/book/search` : '/book/search';
+  // const url = process.env.REACT_APP_NODE_ENV === 'production' ? `http://${process.env.REACT_APP_DNS_NAME}:4000/book/search` : '/book/search';
   console.log(url);
 
   const MoveMainPage = (e) => {
@@ -25,7 +25,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   }
 
   const SubmitHandler = () => {
-    axios.post(url, {
+    axios.post('/book/search', {
       search: InputText,
       sort: 0,
       item_size: 10,
@@ -36,7 +36,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
   }
 
   useEffect(() => {
-    axios.post(url, {
+    axios.post('/book/search', {
       search: SearchText,
       sort: 0,
       item_size: 10,
