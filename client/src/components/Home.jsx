@@ -26,7 +26,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
 
   const SubmitHandler = () => {
     axios.post(url, {
-      search: SearchText,
+      search: InputText,
       sort: 0,
       item_size: 10,
       page_num: 1
