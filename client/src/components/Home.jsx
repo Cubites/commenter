@@ -7,6 +7,7 @@ import List from './List';
 import Header from './Header';
 
 const Home = ({UpAnimation, setUpAnimation}) => {
+  const [SearchText, setSearchText] = useState("");
   const [InputText, setInputText] = useState("")
   const [Books, setBooks] = useState([]);
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const Home = ({UpAnimation, setUpAnimation}) => {
 
   useEffect(() => {
     axios.post('/book/search', {
-      search: InputText,
+      search: SearchText,
       sort: 0,
       item_size: 10,
       page_num: 1
