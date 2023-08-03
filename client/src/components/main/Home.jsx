@@ -6,10 +6,17 @@ import axios from 'axios';
 import List from './List';
 import Header from './Header';
 
-const Home = ({UpAnimation, setUpAnimation}) => {
+const Home = ({
+  UpAnimation, 
+  setUpAnimation, 
+  Books, 
+  setBooks, 
+  setBookData
+}) => {
   const [SearchText, setSearchText] = useState("");
   const [InputText, setInputText] = useState("")
-  const [Books, setBooks] = useState([]);
+  // const [Books, setBooks] = useState([]);
+  const [SortColor, setSortColor] = useState(0);
   const navigate = useNavigate();
   // const url = process.env.REACT_APP_NODE_ENV === 'production' ? `http://${process.env.REACT_APP_DNS_NAME}:4000/book/search` : '/book/search';
   // console.log(url);
@@ -24,9 +31,9 @@ const Home = ({UpAnimation, setUpAnimation}) => {
     setInputText(e.currentTarget.value);
   }
 
-  const SubmitHandler = () => {
+  const SubmitHandler = (inputValue) => {
     axios.post('/book/search', {
-      search: InputText,
+      search: inputValue ? inputValue : InputText,
       sort: 0,
       item_size: 10,
       page_num: 1
@@ -61,8 +68,13 @@ const Home = ({UpAnimation, setUpAnimation}) => {
           </SearchBox>
           <DownBtn onClick={() => setUpAnimation(true)}><DownBtnIcon src="/images/down_btn.png"/></DownBtn>
         </Main>
-        <Header UpAnimation={UpAnimation} />
-        <List Books={Books} />
+        <Header UpAnimation={UpAnimation} SubmitHandler={SubmitHandler} />
+        <List 
+          Books={Books} 
+          SortColor={SortColor} 
+          setSortColor={setSortColor}
+          setBookData={setBookData}
+        />
         {/* <Routes>
           <Route index path="search" element={<List Books={Books} />} />
           <Route path="login" element={<div></div>} />

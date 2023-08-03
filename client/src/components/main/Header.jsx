@@ -25,7 +25,7 @@ const Header = ({UpAnimation, SubmitHandler}) => {
 
 const Headerbar = styled.div`
   width: 100%;
-  height: 80px;
+  min-height: 80px;
   background-color: #44B606;
   box-sizing: border-box;
   padding-left: 15%;

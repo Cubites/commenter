@@ -9,6 +9,7 @@ SELECT
 FROM comment
 WHERE comment_content LIKE '%-평가-1/%';
 
+-- 테스트 데이터 삽입;
 INSERT
 	report (comment_id, user_id, report_reason, report_date)
 VALUES

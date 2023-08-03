@@ -7,8 +7,8 @@ SELECT * FROM comment_favor WHERE user_id = 'UI0000000030' ORDER BY comment_id L
 UPDATE comment_favor SET is_comment_favor = 0 WHERE comment_id = 'CM0000000002';
 UPDATE comment_favor SET is_comment_favor = 1 WHERE is_comment_favor = 0;
 
-insert 
-	comment_favor (comment_id, user_id, favor_cancel)
+INSERT 
+	comment_favor (comment_id, user_id, is_comment_favor)
 VALUES
 	('CM0000000001', 'UI0000000001', 0)
 	, ('CM0000000001', 'UI0000000002', 0)

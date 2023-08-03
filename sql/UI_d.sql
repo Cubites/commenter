@@ -2,7 +2,8 @@ use commenter;
 
 desc user_info;
 
-SELECT * FROM user_info order by user_id DESC limit 1;
+select * from user_info limit 5;
+
 SELECT COUNT(*) FROM user_info;
 
 DELETE FROM user_info WHERE user_id = 'UI0000000051';
@@ -10,6 +11,7 @@ DELETE FROM user_info WHERE user_id = 'UI0000000051';
 DELETE from login_token;
 SELECT * FROM login_token;
 
+-- 테스트 데이터 삽입;
 insert 
 	user_info (user_id, nickname, n_token)
 values

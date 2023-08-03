@@ -1,17 +1,20 @@
 use commenter;
 
--- 테스트 데이터 삽입;
-
 delete from comment;
+
 desc comment;
+
 SELECT * 
 FROM  comment cm 
-ORDER BY cm.comment_id
+ORDER BY cm.comment_id DESC
 LIMIT 5;
+
+delete from comment where comment_id = 'CM0000000472';
 
 SELECT * FROM book limit 5;
 
-insert 
+-- 테스트 데이터 삽입;
+INSERT 
 	comment (comment_id, user_id, isbn, comment_content, comment_date) 
 values 
 	('CM0000000001', 'UI0000000001', '9788960773417', '01-평가-1/1', DATE_FORMAT('2022-08-01 18:01:00.000', '%Y-%m-%d %H:%i:%s.%m'))
