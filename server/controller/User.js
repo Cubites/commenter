@@ -1,23 +1,9 @@
-const router = require('express').Router();
-
 const ConnectionPool = require('../modules/ConnectionPool');
 const { accessToken, refressToken } = require('../modules/jwt');
 
-// 0. 로그인된 상태인지 확인
-// router.post('/user/login', (req, res, next) => {
-//     console.log('1-0. 로그인된 상태인지 확인');
-//     if(req.body.signInSkip){
-//         console.log('1-0-1. 로그인된 상태. 로그인 절차 생략');
-//         console.log('req.signedCookies.auth.access_token : ', req.signedCookies.auth.access_token);
-//         res.status(200).send({user_id: req.signedCookies.auth.user_id});
-//     }else{
-//         console.log('1-0-1. 로그인된 상태가 아님. 로그인 절차 진행');
-//         next();
-//     }
-// })
+let User = {};
 
-// 1. 신규 유저인지 기존 유저인지 판별
-router.post('/user/login', async (req, res, next) => {
+User.check = async (req, res, next) => {
     console.log('\n1-1. 신규 유저인지 기존 유저인지 판별');
     console.log('req.body : ', req.body);
     try{
@@ -50,12 +36,9 @@ router.post('/user/login', async (req, res, next) => {
         res.clearCookie('auth');
         res.status(404).send({user_id: null, login_success: false, isLogout: true});
     }
-});
+}
 
-// isNewBie : 신규유저 판별 (true = 신규유저, false = 기존유저)
-
-// 2. 신규 유저인 경우, 회원가입 시행. 기존 유저는 생략
-router.post('/user/login', async (req, res, next) => {
+User.register = async (req, res, next) => {
     console.log('1-2. 회원가입 필요성 검사');
     console.log('req.body.isNewBie : ', req.body.isNewBie);
     if(req.body.isNewBie){ // 신규유저. 회원가입 진행
@@ -89,10 +72,9 @@ router.post('/user/login', async (req, res, next) => {
         console.log('1-2-2. 기존 유저는 회원가입 절차 생략');
         next();
     }
-});
+}
 
-// 3. Access Token, Refresh Token 발급
-router.post('/user/login', async (req, res, next) => {
+User.token = async (req, res, next) => {
     console.log('1-3. 토큰 발급');
     if(req.body.user_id !== null){
         console.log('1-3-1. 유저 조회에 성공(user_id가 있음). 토큰 발급');
@@ -134,6 +116,83 @@ router.post('/user/login', async (req, res, next) => {
         res.status(404).send({success: false, reason: '유저 조회 실패'});
         console.log(err);
     }
-});
+}
 
-module.exports = router;
+User.update = async (req, res, next) => {
+    console.log('9-1. 유저 정보 수정');
+    if(req.body.user_id === null){
+        console.log('9-1-1. 로그인 상태가 아님. 에러 출력');
+        res.status(404).send({success: false, reason: '잘못된 접근입니다.'});
+    }else{
+        try{
+            const conn = await ConnectionPool.getConnection();
+            try{
+                await conn.query(`
+                    UPDATE user_info SET nickname = '${req.body.user_nick}', intro = '${req.body.user_profile}' WHERE user_id = '${req.body.user_id}'
+                `);
+                conn.release();
+                res.status(200).send({success: true, reason: null});
+            }catch(err){
+                conn.release();
+                console.log('9-1-1. 유저정보 수정 중 에러 발생');
+                console.log(err);
+                res.status(404).send({success: false, reason: err});
+            }
+        }catch(err){
+            console.log('9-1-1. DB 연결 에러');
+            console.log(err);
+            res.status(404).send({success: false, reason: err});
+        }
+    }
+}
+
+User.info = async (req, res, next) => {
+    console.log('8-1. 마이 페이지 조회');
+    if(req.body.user_id === null){
+        console.log('8-1-1. 로그인 상태가 아님. 에러 출력');
+        res.status(404).send({success: false, reason: '잘못된 접근입니다.'});
+    }else{
+        try{
+            const conn = await ConnectionPool.getConnection();
+            try{
+                const userData = await conn.query(`
+                    SELECT 
+                        ui.user_id
+                        , ui.nickname
+                        , ui.intro
+                        , count(distinct cm.comment_id) comment_cnt
+                        , sum(cf.is_comment_favor) favor_cnt
+                    from user_info ui
+                        inner join comment cm 
+                        on ui.user_id = cm.user_id
+                        inner join comment_favor cf
+                        on cm.comment_id = cf.comment_id
+                    where ui.user_id = '${req.body.user_id}';
+                `);
+                const bookFavorData = await conn.query(`
+                    SELECT 
+                        bk.isbn
+                        , bk.book_title 
+                        , bk.image_url 
+                    FROM book_favor bf
+                        INNER JOIN book bk 
+                        ON bf.isbn = bk.isbn 
+                    where bf.user_id = '${req.body.user_id}';
+                `);
+                conn.release();
+                res.status(200).send({...userData[0], book_favor: bookFavorData});
+            }catch(err){
+                conn.release();
+                console.log('8-1-1. 유저 정보 조회 중 에러 발생');
+                console.log(err);
+                req.status(404).send({success: false, reason: err});
+            }
+        }catch(err){
+            console.log('8-1-1. DB 연결 에러');
+            console.log(err);
+            req.status(404).send({success: false, reason: err});
+        }
+    }
+}
+
+module.exports = User;

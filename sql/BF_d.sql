@@ -1,9 +1,12 @@
 use commenter;
 
+-- book 테스트
 DESC book;
-DESC book_favor;
 
 SELECT * FROM book limit 5;
+delete from book;
+
+DESC book_favor;
 SELECT count(*) from book_favor;
 SELECT * FROM book_favor order by user_id limit 5;
 
@@ -16,7 +19,7 @@ SELECT * FROM user_info;
 DELETE from book_favor;
 
 insert 
-	book_favor (user_id, isbn, bookmark_cancel)
+	book_favor (user_id, isbn, is_book_favor)
 values
 	('UI0000000001', '9788960773417', 0)
 	, ('UI0000000002', '9788960773417', 0)

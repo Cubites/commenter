@@ -5,6 +5,7 @@ DESC book_tag;
 
 select * from tag;
 
+-- 테스트 데이터 삽입;
 INSERT tag (tag_id, tag_name)
 VALUES
 	('TG0000000001', 'C')

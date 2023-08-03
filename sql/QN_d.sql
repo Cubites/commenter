@@ -6,10 +6,11 @@ SELECT
 	user_id
 FROM user_info ui ;
 
-SELECT * FROM qna limit 5;
+SELECT * FROM qna order by qna_id desc limit 5;
 
 UPDATE qna SET answer = null WHERE qna_content like '%-2/%';
 
+-- 테스트 데이터 삽입;
 INSERT 
 	qna(qna_id, user_id, qna_reason, qna_content, qna_date, answer)
 VALUES
