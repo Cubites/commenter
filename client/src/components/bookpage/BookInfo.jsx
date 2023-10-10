@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
 
 import Header from './Header';
+import Pagination from './Pagination';
 
-const BookInfo = ({BookData}) => {
+const BookInfo = ({BookData, setUpAnimation}) => {
   const [SortColor, setSortColor] = useState(false);
+  const [CommentsInfo, setCommentsInfo] = useState([]);
+  const [PageNum, setPageNum] = useState(1)
   console.log(BookData);
+
+  useEffect(() => {
+    axios.post('/comment/info', {
+      isbn: BookData.isbn,
+      sort: 0,
+      item_size: 5,
+      page_num: 1
+    })
+      .then(data => setCommentsInfo(() => [...data.data]))
+      .catch(err => console.log('err: ', err));
+  }, [BookData, PageNum]);
   return (
     <BookInfoPage>
-      <Header />
+      <Header setUpAnimation={setUpAnimation} />
       <BookInfoBlock>
         <BookPart>
           <BookImg src={`${BookData.image_url}`} />
@@ -28,7 +43,7 @@ const BookInfo = ({BookData}) => {
             </BookPrice>
           </BookInfoPart>
           <BookTag>#언어 #기초</BookTag>
-          <BookPurchase src="images/purchase.png"/>
+          <BookPurchase target="_blank" href={BookData.sale_link} />
         </BookPart>
         <CommentPart>
           <BookName>
@@ -37,13 +52,13 @@ const BookInfo = ({BookData}) => {
           <SortBox>
             <SortElement 
               style={{color: SortColor ? 'black' : '#46B50A'}}
-              onClick={() => setSortColor(!SortColor)}
+              onClick={() => setSortColor(0)}
             >
               최신순
             </SortElement>
             <SortElement 
               style={{color: SortColor ? '#46B50A' : 'black'}}
-              onClick={() => setSortColor(!SortColor)}
+              onClick={() => setSortColor(1)}
             >
               추천순
             </SortElement>
@@ -53,42 +68,38 @@ const BookInfo = ({BookData}) => {
             <CommentButton src="images/comment.png" />
           </CommentInputBox>
           <CommentsBox>
-            <CommentCloudBox>
-              <CommentCloud>
-                <CommentCloudTop>commenter</CommentCloudTop>
-                <CommentCloudMiddle>테스트용<br/>코멘트입니다.</CommentCloudMiddle>
-                <CommentCloudBottom>
-                  <CommentDate>2023.05.24</CommentDate>
-                  <CommentLikeImg src="images/like.png" />
-                  <CommentLike>5</CommentLike>
-                  <CommentReport>신고</CommentReport>
-                </CommentCloudBottom>
-              </CommentCloud>
-            </CommentCloudBox>
-            <CommentCloudBox>
-              <CommentCloud>
-                <CommentCloudTop>commenter</CommentCloudTop>
-                <CommentCloudMiddle>테스트용<br/>코멘트입니다.</CommentCloudMiddle>
-                <CommentCloudBottom>
-                  <CommentDate>2023.05.24</CommentDate>
-                  <CommentLikeImg src="images/like.png" />
-                  <CommentLike>5</CommentLike>
-                  <CommentReport>신고</CommentReport>
-                </CommentCloudBottom>
-              </CommentCloud>
-            </CommentCloudBox>
-            <CommentCloudBox>
-              <CommentCloud>
-                <CommentCloudTop>commenter</CommentCloudTop>
-                <CommentCloudMiddle>테스트용<br/>코멘트입니다.</CommentCloudMiddle>
-                <CommentCloudBottom>
-                  <CommentDate>2023.05.24</CommentDate>
-                  <CommentLikeImg src="images/like.png" />
-                  <CommentLike>5</CommentLike>
-                  <CommentReport>신고</CommentReport>
-                </CommentCloudBottom>
-              </CommentCloud>
-            </CommentCloudBox>
+            
+            {
+              CommentsInfo.length == 0 
+              ? 
+              <NoCommentBox>
+                코멘트가 없습니다. <br/>
+                혹시 읽어보셨나요? 읽어보셨다면 코멘트를 남겨보세요.
+              </NoCommentBox>
+              : CommentsInfo.map((data, i) => 
+                <CommentCloudBox key={"comment" + i}>
+                  <CommentCloud>
+                    <CommentCloudTop>
+                      {data.nickname}
+                    </CommentCloudTop>
+                    <CommentCloudMiddle>
+                      {data.cm_content}
+                    </CommentCloudMiddle>
+                    <CommentCloudBottom>
+                      <CommentDate>
+                        {data.cm_date}
+                      </CommentDate>
+                      <CommentLikeImg src="images/like.png" />
+                      <CommentLike>
+                        {data.cm_like_num}
+                      </CommentLike>
+                      <CommentReport>신고</CommentReport>
+                    </CommentCloudBottom>
+                  </CommentCloud>
+                </CommentCloudBox>
+              )
+            }
+            <Pagination PageNum={PageNum} setPageNum={setPageNum} />
           </CommentsBox>
         </CommentPart>
       </BookInfoBlock>
@@ -161,9 +172,14 @@ const BookTag = styled.div`
   margin: 10 0;
   padding: 10px;
 `;
-const BookPurchase = styled.img`
+const BookPurchase = styled.a`
+  display: block;
   width: 147px;
   height: 69px;
+  text-decoration: none;
+  color: #000;
+  background-image: url("images/purchase.png");
+  cursor: pointer;
 `
 const CommentPart = styled.div`
   width: 70%;
@@ -190,6 +206,10 @@ const SortElement = styled.div`
   font-size: 1em;
   font-weight: bold;
   cursor: pointer;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
 `
 const CommentInputBox = styled.div`
   width: 100%;
@@ -216,7 +236,24 @@ const CommentButton = styled.img`
 const CommentsBox = styled.div`
   width: 100%;
   height: 686px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
 `
+
+/* 코멘트 */
+/** 코멘트가 없는 경우 **/
+const NoCommentBox = styled.div`
+  margin-top: 50px;
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #666;
+  text-align: center;
+  line-height: 1.5em;
+`
+
+/** 코멘트가 있는 경우 **/
 const CommentCloudBox = styled.div`
   width: 100%;
   min-height: 150px;
@@ -250,7 +287,7 @@ const CommentCloudBottom = styled.div`
   flex-direction: row;
 `
 const CommentDate = styled.div`
-  width: 20%;
+  width: 30%;
   height: 40px;
   line-height: 40px;
   color: #666;

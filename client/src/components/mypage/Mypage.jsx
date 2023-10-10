@@ -2,8 +2,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import Header from './Header';
-import DefaultPage from './DefaultPage';
-import QnaPage from './QnaPage';
+// import DefaultPage from './DefaultPage';
+// import QnaPage from './QnaPage';
 import InfoEditPage from './InfoEditPage';
 
 const Mypage = () => {
@@ -20,19 +20,19 @@ const Mypage = () => {
             <MenuList>
               <MenuItem 
                 onClick={() => setMenuSelect(0)} 
-                style={{color: MenuSelect==0 ? "#00BF19" : "black"}}
+                style={{color: MenuSelect === 0 ? "#00BF19" : "black"}}
               >
                 북마크 / 코멘트 목록
               </MenuItem>
               <MenuItem 
                 onClick={() => setMenuSelect(1)} 
-                style={{color: MenuSelect==1 ? "#00BF19" : "black"}}
+                style={{color: MenuSelect === 1 ? "#00BF19" : "black"}}
               >
                 개인정보 수정
               </MenuItem>
               <MenuItem 
                 onClick={() => setMenuSelect(2)} 
-                style={{color: MenuSelect==2 ? "#00BF19" : "black"}}
+                style={{color: MenuSelect === 2 ? "#00BF19" : "black"}}
               >
                 문의 사항
               </MenuItem>
@@ -83,6 +83,7 @@ const Title = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  // 텍스트 드래그 막기
   -webkit-user-select:none;
   -moz-user-select:none;
   -ms-user-select:none;

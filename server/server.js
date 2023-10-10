@@ -22,7 +22,6 @@ let corsOptions = {
 
 app.set('port', 4000);
 
-
 // Router
 const poolTokenAuth = require('./routers/poolTokenAuth');
 

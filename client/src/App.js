@@ -24,7 +24,12 @@ const App = () => {
           />}
         />
         <Route path="/add" element={<MainPage />}/>
-        <Route path="/book" element={<BookInfo BookData={BookData} />}/>
+        <Route path="/book" element={
+          <BookInfo 
+            BookData={BookData} 
+            setUpAnimation={setUpAnimation}
+          />}
+        />
         <Route path="/login" element={<Login />}/>
         <Route path="/mypage" element={<Mypage />}/>
       </Routes>

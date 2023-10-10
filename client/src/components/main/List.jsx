@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const List = ({Books, SortColor, setSortColor, setBookData}) => {
+const List = ({Books, SortBook, setSortBook, setBookData}) => {
   const navigate = useNavigate();
 
   const MoveBookPage = (e, data) => {
@@ -14,8 +14,18 @@ const List = ({Books, SortColor, setSortColor, setBookData}) => {
   return (
     <Container>
       <Sortblock>
-        <SortElement style={{color: SortColor ? 'black' : '#46B50A'}}>최신순</SortElement>
-        <SortElement style={{color: SortColor ? '#46B50A' : 'black'}}>추천순</SortElement>
+        <SortElement 
+          style={{color: SortBook ? 'black' : '#46B50A'}}
+          onClick={() => setSortBook(0)}
+        >
+          최신순
+        </SortElement>
+        <SortElement 
+          style={{color: SortBook ? '#46B50A' : 'black'}}
+          onClick={() => setSortBook(1)}
+        >
+          추천순
+        </SortElement>
       </Sortblock>
       <BookList>
         {
@@ -71,6 +81,11 @@ const SortElement = styled.div`
   margin: 10px;
   font-size: 1em;
   font-weight: bold;
+  cursor: pointer;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
 `
 const BookList = styled.div`
   width: 100%;
