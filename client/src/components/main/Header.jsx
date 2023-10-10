@@ -1,22 +1,55 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import axios from 'axios';
+import translator from '../../modules/translator';
 
-const Header = ({UpAnimation, SubmitHandler}) => {
+const Header = ({UpAnimation, setUpAnimation, setBooks}) => {
   const [SearchWord, setSearchWord] = useState("");
+
+  const navigate = useNavigate();
+
+  const MoveMainPage = (e) => {
+    e.preventDefault();
+    setUpAnimation(false);
+    navigate("/");
+  }
   const SearchWordHandler = (e) => {
     e.preventDefault();
     setSearchWord(e.currentTarget.value);
   }
-  const SearchHandlerInHeader = (e) => {
+  // const SearchHandlerInHeader = (e) => {
+  //   e.preventDefault();
+  //   SubmitHandler(SearchWord);
+  // }
+
+  const SubmitHandler = (e) => {
     e.preventDefault();
-    SubmitHandler(SearchWord);
+    axios.post('/book/search', {
+      search: SearchWord,
+      sort: "0",
+      item_size: 12,
+      page_num: 1
+    })
+      .then(data => {
+        setBooks(data.data.map(d => {
+          return {
+            ...d,
+            book_title: translator(d.book_title)
+          }
+        }));
+      })
+      .catch(err => console.log("err : " + err));
   }
+
   return (
     <Headerbar className={'mainHeader ' + (UpAnimation ? 'mainHeaderShow' : '')}>
-      <Logo src="images/logo_white.png"/>
-      <Searchbar onSubmit={SearchHandlerInHeader}>
+      <Logo src="images/logo_white.png" onClick={MoveMainPage}/>
+      <Searchbar onSubmit={SubmitHandler}>
         <SearchInput value={SearchWord} onChange={SearchWordHandler}/>
-        <SearchButton type="submit"><SearchButtonIcon src="images/search_icon.png"/></SearchButton>
+        <SearchButton type="submit">
+          <SearchButtonIcon src="images/search_icon.png"/>
+        </SearchButton>
       </Searchbar>
       <LoginButton src="images/login_img.png"/>
     </Headerbar>
@@ -42,6 +75,7 @@ const Headerbar = styled.div`
 const Logo = styled.img`
   display: block;
   height: 50px;
+  cursor: pointer;
   @media screen and (max-width: 900px) {
     height: 4vw;
   }

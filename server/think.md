@@ -72,3 +72,8 @@
   ```
   <br>> 원래 DB값을 불러올 때 시간 값을 읽으면 UTC로 변환함
   <br>> 위 값을 추가하면 시간 값을 STRING으로 받으므로 UTC로 변환되지 않음
+
+### 브라우저 에러 crbug/1173575, non-JS module files deprecated.
+* 원인: react 프록시 설정(setupProxy.js)에서 target 값을 변수값으로 바꾼 것
+  * 환경 변수 값을 못읽어 왔는 등의 문제로 추정
+* 해결: 원래 적혀있던 대로(target 링크 하드코딩) 원복

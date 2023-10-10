@@ -1,19 +1,30 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Header = ({UpAnimation, SubmitHandler}) => {
   const [SearchWord, setSearchWord] = useState("");
+  
+  const navigate = useNavigate();
+
+  // 메인 페이지로 이동
+  const MoveMainPage = (e) => {
+    e.preventDefault();
+    navigate('/search');
+  }
+
   const SearchWordHandler = (e) => {
     e.preventDefault();
     setSearchWord(e.currentTarget.value);
   }
+
   const SearchHandlerInHeader = (e) => {
     e.preventDefault();
     SubmitHandler(SearchWord);
   }
   return (
     <Headerbar>
-      <Logo src="images/logo_white.png"/>
+      <Logo src="images/logo_white.png" onClick={MoveMainPage}/>
       <Searchbar onSubmit={SearchHandlerInHeader}>
         <SearchInput value={SearchWord} onChange={SearchWordHandler}/>
         <SearchButton type="submit"><SearchButtonIcon src="images/search_icon.png"/></SearchButton>
@@ -42,6 +53,7 @@ const Headerbar = styled.div`
 const Logo = styled.img`
   display: block;
   height: 50px;
+  cursor: pointer;
   @media screen and (max-width: 900px) {
     height: 4vw;
   }
@@ -94,12 +106,25 @@ const SearchButton = styled.button`
   }
 `;
 const SearchButtonIcon = styled.img`
+  cursor: pointer;
+  &:hover{
+    opacity: 0.6;
+  }
+  &:active{
+    opacity: 0.3;
+  }
   @media screen and (max-width: 900px) {
     width: 4vw;
   }
 `;
 const LoginButton = styled.img`
   cursor: pointer;
+  &:hover{
+    opacity: 0.6;
+  }
+  &:active{
+    opacity: 0.3;
+  }
   @media screen and (max-width: 900px) {
     height: 5vw;
   }

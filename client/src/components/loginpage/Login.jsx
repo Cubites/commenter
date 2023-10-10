@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import styled from 'styled-components';
 
 import Header from './Header';
@@ -61,9 +61,23 @@ const LoginPageMessage = styled.div`
 `;
 const LoginNaver = styled.img`
   margin: 20px;
+  cursor: pointer;
+  &:hover{
+    opacity: 0.6;
+  }
+  &:active{
+    opacity: 0.3;
+  }
 `;
 const LoginKakao = styled.img`
   margin: 20px;
+  cursor: pointer;
+  &:hover{
+    opacity: 0.6;
+  }
+  &:active{
+    opacity: 0.3;
+  }
 `
 
 

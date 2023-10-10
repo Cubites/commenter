@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 
+import translator from '../../modules/translator';
+
 import List from './List';
 import Header from './Header';
 
@@ -13,17 +15,22 @@ const Home = ({
   setBooks, 
   setBookData
 }) => {
-  const [SearchText, setSearchText] = useState("");
   const [InputText, setInputText] = useState("")
-  // const [Books, setBooks] = useState([]);
-  const [SortColor, setSortColor] = useState(0);
+  const [SortBook, setSortBook] = useState(0);
   const navigate = useNavigate();
   // const url = process.env.REACT_APP_NODE_ENV === 'production' ? `http://${process.env.REACT_APP_DNS_NAME}:4000/book/search` : '/book/search';
   // console.log(url);
 
+  // 메인 페이지로 이동
   const MoveMainPage = (e) => {
     e.preventDefault();
+    setInputText("");
     navigate('/search');
+  }
+
+  const MoveLoginPage = (e) => {
+    e.preventDefault();
+    navigate('/login');
   }
 
   const InputTextHandler = (e) => {
@@ -31,25 +38,41 @@ const Home = ({
     setInputText(e.currentTarget.value);
   }
 
-  const SubmitHandler = (inputValue) => {
+  const SubmitHandler = (e) => {
+    e.preventDefault();
+    setUpAnimation(true);
     axios.post('/book/search', {
-      search: inputValue ? inputValue : InputText,
-      sort: 0,
-      item_size: 10,
+      search: InputText,
+      sort: "0",
+      item_size: 12,
       page_num: 1
     })
-      .then(data => console.log(data.data))
+      .then(data => {
+        setBooks(data.data.map(d => {
+          return {
+            ...d,
+            book_title: translator(d.book_title)
+          }
+        }));
+      })
       .catch(err => console.log("err : " + err));
   }
 
   useEffect(() => {
     axios.post('/book/search', {
-      search: SearchText,
-      sort: 0,
-      item_size: 10,
+      search: InputText,
+      sort: "0",
+      item_size: 12,
       page_num: 1
     })
-      .then(data => setBooks(data.data))
+      .then(data => {
+        setBooks(data.data.map(d => {
+          return {
+            ...d,
+            book_title: translator(d.book_title)
+          }
+        }));
+      })
       .catch(err => console.log("err : " + err));
   }, []);
 
@@ -58,8 +81,8 @@ const Home = ({
       <HomePage className={UpAnimation ? 'listUp' : ''}>
         <Main>  
           <MainTop>
-            <Logo src="/images/logo_color.png" alt="logo"/>
-            <LoginButton onClick={MoveMainPage}>메인 페이지</LoginButton>
+            <Logo src="/images/logo_color.png" alt="logo" onClick={MoveMainPage}/>
+            <LoginButton onClick={MoveLoginPage}>로그인</LoginButton>
           </MainTop>
           <SearchBox onSubmit={SubmitHandler}>
             <SearchIcon src="/images/search_icon.png" alt="search_icon" />
@@ -68,11 +91,15 @@ const Home = ({
           </SearchBox>
           <DownBtn onClick={() => setUpAnimation(true)}><DownBtnIcon src="/images/down_btn.png"/></DownBtn>
         </Main>
-        <Header UpAnimation={UpAnimation} SubmitHandler={SubmitHandler} />
+        <Header 
+          UpAnimation={UpAnimation} 
+          setUpAnimation={setUpAnimation}
+          setBooks={setBooks}
+        />
         <List 
           Books={Books} 
-          SortColor={SortColor} 
-          setSortColor={setSortColor}
+          SortBook={SortBook} 
+          setSortBook={setSortBook}
           setBookData={setBookData}
         />
         {/* <Routes>
@@ -133,6 +160,7 @@ const LoginButton = styled.button`
   font-weight: bold;
   border: none;
   border-radius: 10px;
+  cursor: pointer;
   &:hover{
     opacity: 1;
   }
@@ -188,6 +216,7 @@ const SearchButton = styled.button`
   color: #fff;
   font-size: 20px;
   font-weight: bold;
+  cursor: pointer;
 `;
 const DownBtn = styled.button`
   width: 3vw;
@@ -202,6 +231,7 @@ const DownBtn = styled.button`
   position: relative;
   top: 55vh;
   left: calc(50% - 25px);
+  cursor: pointer;
 `;
 const DownBtnIcon = styled.img`
   width: 1.5vw;

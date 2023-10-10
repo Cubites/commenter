@@ -17,3 +17,8 @@
       EXPIRE_LEN=JWT_만료시간
       PUBLISHER=토큰_발급자명
     </pre>
+
+## 실행
+```bash
+npm run dev
+```

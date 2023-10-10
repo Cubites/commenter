@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Header = ({UpAnimation, SubmitHandler}) => {
+const Header = ({setUpAnimation, SubmitHandler}) => {
   const [SearchWord, setSearchWord] = useState("");
+
+  const navigate = useNavigate();
+
+  const MoveMainPage = (e) => {
+    e.preventDefault();
+    setUpAnimation(false);
+    navigate("/");
+  }
+
+  const MoveLoginPage = (e) => {
+    e.preventDefault();
+    navigate('/login');
+  }
+
   const SearchWordHandler = (e) => {
     e.preventDefault();
     setSearchWord(e.currentTarget.value);
@@ -13,12 +28,12 @@ const Header = ({UpAnimation, SubmitHandler}) => {
   }
   return (
     <Headerbar>
-      <Logo src="images/logo_white.png"/>
+      <Logo src="images/logo_white.png" onClick={MoveMainPage}/>
       <Searchbar onSubmit={SearchHandlerInHeader}>
         <SearchInput value={SearchWord} onChange={SearchWordHandler}/>
         <SearchButton type="submit"><SearchButtonIcon src="images/search_icon.png"/></SearchButton>
       </Searchbar>
-      <LoginButton src="images/login_img.png"/>
+      <LoginButton src="images/login_img.png" onClick={MoveLoginPage}/>
     </Headerbar>
   )
 }
@@ -42,6 +57,7 @@ const Headerbar = styled.div`
 const Logo = styled.img`
   display: block;
   height: 50px;
+  cursor: pointer;
   @media screen and (max-width: 900px) {
     height: 4vw;
   }
@@ -89,6 +105,12 @@ const SearchButton = styled.button`
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  &:hover{
+    opacity: 0.8;
+  }
+  &:active{
+    opacity: 0.6;
+  }
   @media screen and (max-width: 900px) {
     width: 15vw;
   }
@@ -100,6 +122,12 @@ const SearchButtonIcon = styled.img`
 `;
 const LoginButton = styled.img`
   cursor: pointer;
+  &:hover{
+    opacity: 0.9;
+  }
+  &:active{
+    opacity: 0.8;
+  }
   @media screen and (max-width: 900px) {
     height: 5vw;
   }
