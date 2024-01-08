@@ -1,5 +1,44 @@
-*{
+*,
+*::before,
+*::after{
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+.mainHeader {
+  /* position: absolute;
+  top: 0; */
+  opacity: 0;
+}
+.mainHeaderShow {
+  animation-name: headerShow;
+  animation-duration: 0.5s;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+}
+
+.listUp {
+  animation-name: listUp;
+  animation-duration: 0.5s;
+  animation-direction: normal;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes listUp {
+  from {
+    top: 0;
+  }
+  to {
+    top: -80vh;
+  }
+}
+
+@keyframes headerShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
